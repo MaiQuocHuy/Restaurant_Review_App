@@ -1,9 +1,15 @@
 import {View, Text, StatusBar, Image, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Images} from '../constants';
 import {Display} from '../utils';
 
-const SplashScreen = () => {
+const SplashScreen = ({navigation}) => {
+  // Navigation to Signin screen after 2 seconds
+  useEffect(() => {
+    setTimeout(() => {
+      navigation.replace('HomeTabs');
+    }, 2000);
+  }, []);
   return (
     <View className="flex-1 items-center justify-center bg-[#0A8791]">
       <StatusBar
@@ -11,13 +17,9 @@ const SplashScreen = () => {
         className="bg-[#0A8791]"
         translucent
       />
-      <Image
-        source={Images.PLATE}
-        resizeMethod="contain"
-        style={styles.image}
-      />
+      <Image source={Images.PLATE} resizeMethod="resize" style={styles.image} />
       <Text className="text-DEFAULT_WHITE text-3xl font-POPPINS_LIGHT">
-        Review App
+        Review Restaurant App
       </Text>
     </View>
   );
