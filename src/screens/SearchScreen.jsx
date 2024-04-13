@@ -28,7 +28,6 @@ export default function SearchScreen() {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.log('Location permission granted');
-          // Now you can call Geolocation.getCurrentPosition
           Geolocation.getCurrentPosition(info => {
             console.log('Info', info);
             setUserLocation(info);

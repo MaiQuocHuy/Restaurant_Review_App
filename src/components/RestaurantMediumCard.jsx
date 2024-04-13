@@ -7,37 +7,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function RestaurantMediumCard() {
   return (
-    // <View className="flex-row items-center mx-4 shadow-sm rounded-lg bg-DEFAULT_WHITE mt-2">
-    //     <View>
-    //         <Image
-    //             source={{
-    //                 uri: 'https://as1.ftcdn.net/v2/jpg/03/24/73/92/1000_F_324739203_keeq8udvv0P2h1MLYJ0GLSlTBagoXS48.jpg',
-    //             }}
-    //             className="h-[20vw] w-[20vw] rounded-lg m-1"
-    //         />
-    //     </View>
-    //     <View className="flex-1 mx-2">
-    //         <View className="flex-row items-center justify-between">
-    //             <Text className="text-sm font-POPPINS_BOLD text-DEFAULT_BLACK mb-1">Burgur</Text>
-    //             <View className="flex-row items-center">
-    //                 <FontAwesome name="star" size={14} color="#FBA83C" />
-    //                 <Text className="ml-[5px] text-sm font-POPPINS_BOLD text-DEFAULT_BLACK">4</Text>
-    //                 <Text className="text-sm font-POPPINS_MEDIUM text-DEFAULT_BLACK">({10})</Text>
-    //             </View>
-    //         </View>
-    //         <Text className="text-sm font-POPPINS_MEDIUM text-DEFAULT_GREY mb-2">noddles</Text>
-    //         <View className="flex-row items-center justify-between">
-    //             <View className="flex-row items-center">
-    //                 <Image source={Images.DELIVERY_TIME} className="h-4 w-4" />
-    //                 <Text className="text-sm font-POPPINS_BOLD text-DEFAULT_BLACK">10</Text>
-    //             </View>
-    //             <View className="flex-row items-center">
-    //                 <Image source={Images.DELIVER} className="h-4 w-4" />
-    //                 <Text className="text-sm font-POPPINS_BOLD text-DEFAULT_BLACK">200m</Text>
-    //             </View>
-    //         </View>
-    //     </View>
-    // </View>
     <View style={styles.container}>
       <View>
         <Image

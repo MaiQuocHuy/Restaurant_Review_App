@@ -22,7 +22,7 @@ export default function CategoryMenuItem({
         className={`text-sm font-POPPINS_MEDIUM text-DEFAULT_WHITE mt-1 ${
           activeCategory === name ? 'opacity-100' : 'opacity-50'
         }`}>
-        {name}
+       {name}
       </Text>
     </TouchableOpacity>
   );

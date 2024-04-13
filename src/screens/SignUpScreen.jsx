@@ -57,7 +57,7 @@ export default function SignUpScreen() {
           name="chevron-back-outline"
           size={30}
           color="#000"
-          onPress={() => navigation.goBack()}
+          // onPress={() => navigation.goBack()}
         />
         <Text className="text-xl font-POPPINS_MEDIUM w-[80%] text-center text-DEFAULT_BLACK">
           Sign up

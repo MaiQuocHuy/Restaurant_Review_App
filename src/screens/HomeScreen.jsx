@@ -17,7 +17,7 @@ import CategoryMenuItem from '../components/CategoryMenuItem';
 import RestaurantCard from '../components/RestaurantCard';
 import RestaurantMediumCard from '../components/RestaurantMediumCard';
 
-export default function HomeScreen() {
+export default function HomeScreen({navigation}) {
   const [activeCategory, setActiveCategory] = useState();
   const [activeSortItem, setActiveSortItem] = useState('recent');
   const [restaurants, setRestaurants] = useState([
@@ -112,7 +112,14 @@ export default function HomeScreen() {
               ListHeaderComponent={() => <Separator width={20} />}
               ListFooterComponent={() => <Separator width={20} />}
               ItemSeparatorComponent={() => <Separator width={10} />}
-              renderItem={({item}) => <RestaurantCard />}
+              renderItem={({item}) => (
+                <RestaurantCard
+                  {...item}
+                  navigate={restaurantId =>
+                    navigation.navigate('Restaurant', {restaurantId})
+                  }
+                />
+              )}
             />
           </View>
           <View className="flex-row justify-evenly items-center mt-2 shadow-sm px-6">

@@ -8,6 +8,7 @@ import {
   SplashScreen,
 } from '../screens';
 import BottomTabs from './BottomTabs';
+import RestaurantScreen from '../screens/RestaurantScreen';
 
 const Stack = createStackNavigator();
 const Navigators = () => {
@@ -19,6 +20,7 @@ const Navigators = () => {
         <Stack.Screen name="Signup" component={SignUpScreen} />
         <Stack.Screen name="Forgot" component={ForgotPasswordScreen} />
         <Stack.Screen name="HomeTabs" component={BottomTabs} />
+        <Stack.Screen name="Restaurant" component={RestaurantScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
