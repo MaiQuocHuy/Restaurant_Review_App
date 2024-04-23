@@ -1,5 +1,5 @@
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   ForgotPasswordScreen,
   HomeScreen,
@@ -8,9 +8,8 @@ import {
   SplashScreen,
 } from '../screens';
 import BottomTabs from './BottomTabs';
-import RestaurantScreen from '../screens/RestaurantScreen';
-
-const Stack = createStackNavigator();
+import AdminStackScreen from './admin/AdminStackScreen';
+const Stack = createNativeStackNavigator();
 const Navigators = () => {
   return (
     <NavigationContainer>
@@ -20,7 +19,7 @@ const Navigators = () => {
         <Stack.Screen name="Signup" component={SignUpScreen} />
         <Stack.Screen name="Forgot" component={ForgotPasswordScreen} />
         <Stack.Screen name="HomeTabs" component={BottomTabs} />
-        <Stack.Screen name="Restaurant" component={RestaurantScreen} />
+        <Stack.Screen name="Admin" component={AdminStackScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

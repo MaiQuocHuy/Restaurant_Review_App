@@ -1,3 +1,3 @@
 import Display from './Display';
-
-export {Display};
+import {dataCountry, dataTypeRestaurant} from './data';
+export {Display, dataCountry, dataTypeRestaurant};
