@@ -4,6 +4,9 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {HomeScreen, SearchScreen, UserProfileScreen} from '../screens';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Display} from '../utils';
+import HomeStackScreen from './HomeStackScreen';
+import SearchStackScreen from './SearchStackScreen';
+import ProfileStackScreen from './ProfileStackScreen';
 
 export default function BottomTabs() {
   const BottomTabs = createBottomTabNavigator();
@@ -25,8 +28,8 @@ export default function BottomTabs() {
       }}
       op>
       <BottomTabs.Screen
-        name="Home"
-        component={HomeScreen}
+        name="HomeStack"
+        component={HomeStackScreen}
         options={{
           tabBarIcon: ({color}) => (
             <Ionicons name="home-outline" size={23} color={color} />
@@ -35,8 +38,8 @@ export default function BottomTabs() {
       />
 
       <BottomTabs.Screen
-        name="Search"
-        component={SearchScreen}
+        name="SearchStack"
+        component={SearchStackScreen}
         options={{
           tabBarIcon: ({color}) => (
             <Ionicons name="search-outline" size={23} color={color} />
@@ -44,8 +47,8 @@ export default function BottomTabs() {
         }}
       />
       <BottomTabs.Screen
-        name="UserProfile"
-        component={UserProfileScreen}
+        name="ProfileStack"
+        component={ProfileStackScreen}
         options={{
           tabBarIcon: ({color}) => (
             <Ionicons name="person-outline" size={23} color={color} />

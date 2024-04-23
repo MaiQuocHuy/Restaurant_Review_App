@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import LottieView from 'lottie-react-native';
 import {Images} from '../constants';
 import {Separator} from '../components';
+import axios from 'axios';
 
 const inputStyle = state => {
   switch (state) {
@@ -25,23 +26,29 @@ const inputStyle = state => {
   }
 };
 
-export default function SignUpScreen() {
+export default function SignUpScreen({navigation}) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordShow, setIsPasswordShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const register = () => {
+  const register = async () => {
     const user = {
       username,
       email,
       password,
     };
-    console.log('====================================');
-    console.log(user);
-    setIsLoading(true);
-    console.log('====================================');
+    try {
+      const {data} = await axios.post('http://10.0.2.2:8080/api/signup', {
+        name: username,
+        email,
+        password,
+      });
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -57,7 +64,7 @@ export default function SignUpScreen() {
           name="chevron-back-outline"
           size={30}
           color="#000"
-          // onPress={() => navigation.goBack()}
+          onPress={() => navigation.goBack()}
         />
         <Text className="text-xl font-POPPINS_MEDIUM w-[80%] text-center text-DEFAULT_BLACK">
           Sign up
@@ -82,6 +89,7 @@ export default function SignUpScreen() {
             placeholderTextColor="#C2C2CB"
             selectionColor="#000"
             className="text-lg align-middle text-DEFAULT_BLACK flex-1 h-[6vh]"
+            autoCapitalize="none"
             onChangeText={text => setUsername(text)}
             onEndEditing={({nativeEvent: {text}}) =>
               console.log('username', text)
@@ -106,6 +114,7 @@ export default function SignUpScreen() {
             selectionColor="#000"
             className="text-lg align-middle text-DEFAULT_BLACK flex-1 h-[6vh]"
             onChangeText={text => setEmail(text)}
+            autoCapitalize="none"
             onEndEditing={({nativeEvent: {text}}) => console.log('email', text)}
           />
         </View>
@@ -127,6 +136,7 @@ export default function SignUpScreen() {
             placeholderTextColor="#C2C2CB"
             selectionColor="#C2C2CB"
             className="text-lg align-middle text-DEFAULT_BLACK flex-1 h-[6vh]"
+            autoCapitalize="none"
             onChangeText={text => setPassword(text)}
           />
           <Feather
@@ -144,18 +154,9 @@ export default function SignUpScreen() {
       <TouchableOpacity
         className="bg-DEFAULT_GREEN rounded-lg mx-5 h-[6vh] justify-center items-center mt-5"
         onPress={() => register()}>
-        {isLoading ? (
-          <LottieView
-            source={Images.LOADING}
-            autoPlay
-            loop
-            className="flex-1"
-          />
-        ) : (
-          <Text className="text-lg text-DEFAULT_WHITE font-POPPINS_MEDIUM">
-            Create Account
-          </Text>
-        )}
+        <Text className="text-lg text-DEFAULT_WHITE font-POPPINS_MEDIUM">
+          Create Account
+        </Text>
       </TouchableOpacity>
     </View>
   );

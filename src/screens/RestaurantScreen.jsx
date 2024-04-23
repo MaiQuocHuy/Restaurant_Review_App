@@ -8,56 +8,17 @@ import {
   SafeAreaView,
   Button,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
 import React from 'react';
-import {Images} from '../constants';
 import {useState} from 'react';
-import CategoryListItem from '../components/CategoryListItem';
-import FoodCard from '../components/FoodCard';
 import {Separator} from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Display} from '../utils';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import {Dimensions} from 'react-native';
-
-const ListHeader = () => (
-  <View
-    style={{
-      flexDirection: 'row',
-      flex: 1,
-      width: 40,
-      justifyContent: 'flex-end',
-    }}>
-    <View
-      style={{
-        backgroundColor: '#FCE6CD',
-        width: 20,
-        borderTopLeftRadius: 64,
-        borderBottomLeftRadius: 64,
-      }}
-    />
-  </View>
-);
-
-const ListFooter = () => (
-  <View
-    style={{
-      flexDirection: 'row',
-      flex: 1,
-      width: 40,
-    }}>
-    <View
-      style={{
-        backgroundColor: '#FCE6CD',
-        width: 20,
-        borderTopRightRadius: 64,
-        borderBottomRightRadius: 64,
-      }}
-    />
-  </View>
-);
+import {useRef} from 'react';
 
 const RestaurantScreen = ({
   navigation,
@@ -97,6 +58,51 @@ const RestaurantScreen = ({
       id: 10,
     },
   ]);
+  //state active
+  const [activeSection, setActiveSection] = useState('Menu');
+  //ref
+  const menuRef = useRef();
+  const reviewsRef = useRef();
+  const detailsRef = useRef();
+  const scrollViewRef = useRef();
+  // scrollToPosition
+  const [detailsY, setDetailsY] = useState(0);
+  const [menuY, setMenuY] = useState(0);
+  const [reviewsY, setReviewsY] = useState(0);
+
+  const handleScroll = event => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    if (menuRef.current) {
+      try {
+        menuRef.current.measure((x, y, width, height, pageX, pageY) => {
+          if (scrollY >= pageY && scrollY < pageY + height) {
+            console.log('Menu', x, y);
+            setActiveSection('Menu');
+          }
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (reviewsRef.current) {
+      reviewsRef.current.measure((x, y, width, height, pageX, pageY) => {
+        if (scrollY >= pageY && scrollY < pageY + height) {
+          console.log('Reviews', x, y);
+          setActiveSection('Reviews');
+        }
+      });
+    }
+
+    if (detailsRef.current) {
+      detailsRef.current.measure((x, y, width, height, pageX, pageY) => {
+        if (scrollY >= pageY && scrollY < pageY + height) {
+          console.log('Details', x, y);
+          setActiveSection('Details');
+        }
+      });
+    }
+  };
 
   return (
     <SafeAreaView className="flex flex-1 justify-center">
@@ -108,12 +114,18 @@ const RestaurantScreen = ({
         className="absolute top-0 h-full w-full"
       />
       <View className="flex flex-row justify-between items-center h-[13%] pt-12 px-4">
-        <Ionicons name="chevron-back-outline" size={30} color="#fff" />
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Back');
+            navigation.goBack();
+          }}>
+          <Ionicons name="chevron-back-outline" size={30} color="#fff" />
+        </TouchableOpacity>
         <View>
           <Ionicons name="share-outline" size={30} color="#fff" />
         </View>
       </View>
-      <ScrollView>
+      <ScrollView onScroll={handleScroll} ref={scrollViewRef}>
         <View className="flex justify-center flex-1">
           <Separator height={200} />
           <View className="bg-DEFAULT_WHITE rounded-t-3xl">
@@ -160,23 +172,84 @@ const RestaurantScreen = ({
               </View>
             </View>
             <View className="flex flex-row pl-4 space-x-4 border-b-2 border-b-DEFAULT_GREY my-2">
-              <View className="p-2">
-                <Text className="text-base font-POPPINS_MEDIUM">Menu</Text>
-              </View>
-              <View className="p-2">
-                <Text className="text-base font-POPPINS_MEDIUM">Reviews</Text>
-              </View>
-              <View className="p-2">
-                <Text className="text-base font-POPPINS_MEDIUM">Details</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  scrollViewRef.current.scrollTo({
+                    x: 0,
+                    y: menuY,
+                    animated: true,
+                  });
+                }}>
+                <View className="p-2">
+                  <Text
+                    className="text-base font-POPPINS_MEDIUM"
+                    style={
+                      activeSection === 'Menu' ? styles.activeText : styles.text
+                    }>
+                    Menu
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  scrollViewRef.current.scrollTo({
+                    x: 0,
+                    y: reviewsY,
+                    animated: true,
+                  })
+                }>
+                <View className="p-2">
+                  <Text
+                    className="text-base font-POPPINS_MEDIUM"
+                    style={
+                      activeSection === 'Reviews'
+                        ? styles.activeText
+                        : styles.text
+                    }>
+                    Reviews
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  scrollViewRef.current.scrollTo({
+                    x: 0,
+                    y: detailsY,
+                    animated: true,
+                  })
+                }>
+                <View className="p-2">
+                  <Text
+                    className="text-base font-POPPINS_MEDIUM"
+                    style={
+                      activeSection === 'Details'
+                        ? styles.activeText
+                        : styles.text
+                    }>
+                    Details
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
             {/* Menu */}
-
-            <View className="flex my-4 gap-2 px-6 pt-2">
+            <View
+              className="flex my-4 gap-2 px-6 pt-2"
+              onLayout={event => {
+                console.log('MenuY', event.nativeEvent.layout.y);
+                setMenuY(event.nativeEvent.layout.y);
+              }}
+              ref={menuRef}
+              collapsable={false}>
               <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                 Menu
               </Text>
-              <TouchableOpacity className="bg-DEFAULT_GREEN border border-SECONDARY_WHITE justify-center items-center py-2">
+              <TouchableOpacity
+                className="bg-DEFAULT_GREEN border border-SECONDARY_WHITE justify-center items-center py-2"
+                onPress={() =>
+                  navigation.navigate('RestaurantMenu', {
+                    restaurantId: restaurantId,
+                  })
+                }>
                 <Text className="text-lg text-DEFAULT_WHITE font-POPPINS_REGULAR uppercase">
                   See full menu
                 </Text>
@@ -184,8 +257,11 @@ const RestaurantScreen = ({
             </View>
 
             {/* Reviews */}
-
-            <View className="flex flex-col my-4 gap-2 px-6 pt-2 justify-between">
+            <View
+              className="flex flex-col my-4 gap-2 px-6 pt-2 justify-between"
+              onLayout={event => setReviewsY(event.nativeEvent.layout.y)}
+              ref={reviewsRef}
+              collapsable={false}>
               <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                 Reviews
               </Text>
@@ -335,7 +411,15 @@ const RestaurantScreen = ({
                 </View>
               </View>
               <View className="pt-2 w-full">
-                <TouchableOpacity className="bg-DEFAULT_GREEN border border-SECONDARY_WHITE justify-center items-center py-2">
+                <TouchableOpacity
+                  className="bg-DEFAULT_GREEN border border-SECONDARY_WHITE justify-center items-center py-2"
+                  onPress={
+                    () =>
+                      navigation.navigate('RestaurantReview', {
+                        restaurantId: restaurantId,
+                      })
+                    // navigation.navigate('Test')
+                  }>
                   <Text className="text-lg text-DEFAULT_WHITE font-POPPINS_REGULAR uppercase">
                     See all reviews
                   </Text>
@@ -343,7 +427,14 @@ const RestaurantScreen = ({
               </View>
             </View>
             {/* Details */}
-            <View className="flex flex-col my-4 gap-2 px-6 pt-2">
+            <View
+              className="flex flex-col my-4 gap-2 px-6 pt-2"
+              collapsable={false}
+              onLayout={event => {
+                console.log('DetailsY', event.nativeEvent.layout.y);
+                setDetailsY(event.nativeEvent.layout.y);
+              }}
+              ref={detailsRef}>
               <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                 Details
               </Text>
@@ -427,34 +518,24 @@ const RestaurantScreen = ({
                   {/* Off */}
                 </View>
               </View>
+              <Separator height={60} />
             </View>
-
-            {/* <View className="my-2">
-                    <FlatList
-                      data={restaurants}
-                      keyExtractor={item => item?.id}
-                      horizontal
-                      ListHeaderComponent={() => <ListHeader />}
-                      ListFooterComponent={() => <ListFooter />}
-                      showsHorizontalScrollIndicator={false}
-                      renderItem={({item}) => (
-                        <CategoryListItem
-                        // name={item}
-                        // isActive={item === selectedCategory}
-                        // selectCategory={category => setSelectedCategory(category)}
-                        />
-                      )}
-                    />
-                  </View> */}
-            {/* <View className="px-5">
-              <FoodCard />
-              <FoodCard />
-            </View> */}
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  activeText: {
+    color: '#FBA83C',
+    borderBottomColor: '#FBA83C',
+    borderBottomWidth: 3,
+  },
+  text: {
+    color: '#C2C2CB',
+  },
+});
 
 export default RestaurantScreen;

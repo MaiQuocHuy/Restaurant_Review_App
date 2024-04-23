@@ -8,7 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Separator} from '../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -16,42 +16,23 @@ import {CATEGORIES, Images} from '../constants';
 import CategoryMenuItem from '../components/CategoryMenuItem';
 import RestaurantCard from '../components/RestaurantCard';
 import RestaurantMediumCard from '../components/RestaurantMediumCard';
+import axios from 'axios';
 
 export default function HomeScreen({navigation}) {
   const [activeCategory, setActiveCategory] = useState();
   const [activeSortItem, setActiveSortItem] = useState('recent');
-  const [restaurants, setRestaurants] = useState([
-    {
-      id: 1,
-    },
-    {
-      id: 2,
-    },
-    {
-      id: 3,
-    },
-    {
-      id: 4,
-    },
-    {
-      id: 5,
-    },
-    {
-      id: 6,
-    },
-    {
-      id: 7,
-    },
-    {
-      id: 8,
-    },
-    {
-      id: 9,
-    },
-    {
-      id: 10,
-    },
-  ]);
+  const [restaurants, setRestaurants] = useState([]);
+
+  const fetchRestaurnats = async () => {
+    const {data} = await axios.get('http://10.0.2.2:8080/api/restaurant/show');
+    if (data.success) {
+      setRestaurants(data.restaurants);
+      console.log('Restaurants', data);
+    }
+  };
+  useEffect(() => {
+    fetchRestaurnats();
+  }, []);
 
   return (
     <View classname="flex-1 bg-SECONDARY_WHITE">
@@ -106,7 +87,7 @@ export default function HomeScreen({navigation}) {
             </View>
             <FlatList
               data={restaurants}
-              keyExtractor={item => item?.id}
+              keyExtractor={item => item?._id}
               horizontal
               showsHorizontalScrollIndicator={false}
               ListHeaderComponent={() => <Separator width={20} />}
@@ -114,6 +95,7 @@ export default function HomeScreen({navigation}) {
               ItemSeparatorComponent={() => <Separator width={10} />}
               renderItem={({item}) => (
                 <RestaurantCard
+                  key={item?._id}
                   {...item}
                   navigate={restaurantId =>
                     navigation.navigate('Restaurant', {restaurantId})
@@ -179,7 +161,7 @@ export default function HomeScreen({navigation}) {
           <RestaurantMediumCard />
           <RestaurantMediumCard />
 
-          <Separator height={200} />
+          <Separator height={290} />
         </View>
       </ScrollView>
     </View>
