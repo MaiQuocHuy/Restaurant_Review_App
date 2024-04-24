@@ -3,15 +3,15 @@ import SplashScreen from './SplashScreen';
 import SignInScreen from './SignInScreen';
 import SignUpScreen from './SignUpScreen';
 import ForgotPasswordScreen from './ForgotPasswordScreen';
-import HomeScreen from './HomeScreen';
-import SearchScreen from './SearchScreen';
-import UserProfileScreen from './UserProfileScreen';
-import RestaurantScreen from './RestaurantScreen';
-import RestaurantMenuScreen from './RestaurantMenuScreen';
-import RestaurantReviewScreen from './RestaurantReviewScreen';
-import ManageRestaurantProfileScreen from './admin/ManageRestaurantProfileScreen';
-import ManageMenuDishScreen from './admin/ManageMenuDishScreen';
-import ManagePostScreen from './admin/ManagePostScreen';
+import HomeScreen from './user/HomeScreen';
+import SearchScreen from './user/SearchScreen';
+import UserProfileScreen from './user/UserProfileScreen';
+import RestaurantScreen from './user/RestaurantScreen';
+import RestaurantMenuScreen from './user/RestaurantMenuScreen';
+import RestaurantReviewScreen from './user/RestaurantReviewScreen';
+import ManageRestaurantProfileScreen from './ownres/ManageRestaurantProfileScreen';
+import ManageMenuDishScreen from './ownres/ManageMenuDishScreen';
+import ManagePostScreen from './ownres/ManagePostScreen';
 export {
   HomeScreen,
   SplashScreen,

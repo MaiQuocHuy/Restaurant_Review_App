@@ -9,10 +9,10 @@ import {
   StyleSheet,
 } from 'react-native';
 import React, {useState} from 'react';
-import {Separator} from '../components';
+import {Separator} from '../../components';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import BottomSheetModel from '../components/BottomSheetModel';
+import BottomSheetModel from '../../components/BottomSheetModel';
 
 const RestaurantReviewScreen = ({
   navigation,

@@ -5,12 +5,7 @@ import {StyleSheet, View} from 'react-native';
 import {LogBox} from 'react-native';
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested']); // Ignore log notification by message
-const GooglePlacesInput = ({
-  setStreetAddress,
-  isFocusStreetAddress,
-  setIsFocusStreetAddress,
-  value,
-}) => {
+const GooglePlacesInput = ({setStreetAddress, isFocusStreetAddress, value}) => {
   console.log('GooglePlacesInput', value);
   return (
     <GooglePlacesAutocomplete
@@ -23,8 +18,6 @@ const GooglePlacesInput = ({
         console.log('Details:', details);
       }}
       textInputProps={{
-        onFocus: () => setIsFocusStreetAddress(true),
-        onBlur: () => setIsFocusStreetAddress(false),
         onChange: newText => {
           console.log(newText);
           setStreetAddress(newText);

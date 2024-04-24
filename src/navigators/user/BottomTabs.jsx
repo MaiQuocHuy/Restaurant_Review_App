@@ -1,12 +1,13 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {HomeScreen, SearchScreen, UserProfileScreen} from '../screens';
+import {HomeScreen, SearchScreen, UserProfileScreen} from '../../screens';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Display} from '../utils';
+import {Display} from '../../utils';
 import HomeStackScreen from './HomeStackScreen';
 import SearchStackScreen from './SearchStackScreen';
 import ProfileStackScreen from './ProfileStackScreen';
+import PostStackScreen from './PostStackScreen';
 
 export default function BottomTabs() {
   const BottomTabs = createBottomTabNavigator();
@@ -33,6 +34,16 @@ export default function BottomTabs() {
         options={{
           tabBarIcon: ({color}) => (
             <Ionicons name="home-outline" size={23} color={color} />
+          ),
+        }}
+      />
+
+      <BottomTabs.Screen
+        name="PostStack"
+        component={PostStackScreen}
+        options={{
+          tabBarIcon: ({color}) => (
+            <MaterialIcons name="post-add" size={23} color={color} />
           ),
         }}
       />

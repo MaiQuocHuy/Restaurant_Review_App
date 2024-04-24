@@ -9,13 +9,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {Separator} from '../components';
+import {Separator} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {CATEGORIES, Images} from '../constants';
-import CategoryMenuItem from '../components/CategoryMenuItem';
-import RestaurantCard from '../components/RestaurantCard';
-import RestaurantMediumCard from '../components/RestaurantMediumCard';
+import {CATEGORIES, Images} from '../../constants';
+import CategoryMenuItem from '../../components/CategoryMenuItem';
+import RestaurantCard from '../../components/RestaurantCard';
+import RestaurantMediumCard from '../../components/RestaurantMediumCard';
 import axios from 'axios';
 
 export default function HomeScreen({navigation}) {
@@ -30,6 +30,7 @@ export default function HomeScreen({navigation}) {
       console.log('Restaurants', data);
     }
   };
+
   useEffect(() => {
     fetchRestaurnats();
   }, []);

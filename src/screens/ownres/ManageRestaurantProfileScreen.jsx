@@ -281,7 +281,6 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
           <GooglePlacesInput
             setStreetAddress={setStreetAddress}
             isFocusStreetAddress={isFocusStreetAddress}
-            setIsFocusStreetAddress={setIsFocusStreetAddress}
             value={streetAddress}
           />
         </View>

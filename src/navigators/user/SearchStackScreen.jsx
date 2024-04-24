@@ -1,7 +1,7 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {SearchScreen} from '../screens';
+import {SearchScreen} from '../../screens';
 
 const SearchStack = createNativeStackNavigator();
 

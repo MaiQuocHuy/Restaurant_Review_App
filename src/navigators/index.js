@@ -7,8 +7,8 @@ import {
   SignUpScreen,
   SplashScreen,
 } from '../screens';
-import BottomTabs from './BottomTabs';
-import AdminStackScreen from './admin/AdminStackScreen';
+import BottomTabs from './user/BottomTabs';
+import AdminStackScreen from './ownres/AdminStackScreen';
 const Stack = createNativeStackNavigator();
 const Navigators = () => {
   return (

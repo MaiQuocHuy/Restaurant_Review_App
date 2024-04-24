@@ -5,16 +5,16 @@ import {Display} from '../utils';
 
 const SplashScreen = ({navigation}) => {
   // Navigation to Signin screen after 2 seconds
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     navigation.replace('HomeTabs');
-  //   }, 2000);
-  // }, []);
   useEffect(() => {
     setTimeout(() => {
-      navigation.replace('Signin');
-    });
+      navigation.replace('HomeTabs');
+    }, 2000);
   }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     navigation.replace('Signin');
+  //   });
+  // }, []);
   return (
     <View className="flex-1 items-center justify-center bg-[#0A8791]">
       <StatusBar

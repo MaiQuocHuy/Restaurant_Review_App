@@ -6,8 +6,8 @@ import {
   RestaurantMenuScreen,
   RestaurantReviewScreen,
   RestaurantScreen,
-} from '../screens';
-import TestScreen from '../screens/TestScreen';
+} from '../../screens';
+import TestScreen from '../../screens/TestScreen';
 
 const HomeStack = createNativeStackNavigator();
 
