@@ -2,7 +2,7 @@ import {View, Text} from 'react-native';
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ManageMenuDishScreen} from '../../screens';
-import AddDishScreen from '../../screens/admin/AddDishScreen';
+import AddDishScreen from '../../screens/ownres/AddDishScreen';
 
 const MenuDishStack = createNativeStackNavigator();
 

@@ -8,12 +8,12 @@ import {
   FlatList,
 } from 'react-native';
 import React from 'react';
-import {Separator} from '../components';
+import {Separator} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useState} from 'react';
-import DishItem from '../components/DishItem';
-import CategoryListItem from '../components/CategoryListItem';
-import {dataTypeDish} from '../utils/data';
+import DishItem from '../../components/DishItem';
+import CategoryListItem from '../../components/CategoryListItem';
+import {dataTypeDish} from '../../utils/data';
 import axios from 'axios';
 import {useEffect} from 'react';
 
@@ -48,7 +48,7 @@ const RestaurantMenuScreen = ({
     if (data.success) {
       console.log('ChooseType', data.dishes);
       setItems(data.dishes);
-    } 
+    }
   };
   return (
     <View classname="flex-1 bg-SECONDARY_WHITE">

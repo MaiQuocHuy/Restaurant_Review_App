@@ -1,6 +1,6 @@
 const dataTypeRestaurant = [
   {label: 'French restaurant', value: 'frenchrestaurant'},
-  {label: 'Italian restaurant', value: 'italian restaurant'},
+  {label: 'Italian restaurant', value: 'italianrestaurant'},
   {label: 'German restaurant', value: 'germanrestaurant'},
   {label: 'Chinese restaurant', value: 'chineserestaurant'},
 ];

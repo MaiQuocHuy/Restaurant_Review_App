@@ -1,13 +1,24 @@
 import {View, Text, Image, Button} from 'react-native';
 import React from 'react';
 import {StatusBar} from 'react-native';
-import {Separator, ToggleButton} from '../components';
+import {Separator, ToggleButton} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import axios from 'axios';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 export default function UserProfile({navigation}) {
+  const handleSignOut = async () => {
+    // sign out logic here
+    const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
+    console.log(data);
+    if (data.success) {
+      navigation.navigate('Signin');
+    }
+    // console.log(data);
+  };
   return (
     <View className="flex-1 bg-DEFAULT_WHITE px-4 space-y-3">
       <StatusBar
@@ -84,15 +95,17 @@ export default function UserProfile({navigation}) {
         </View>
         <Ionicons size={28} color="#0E122B" name="chevron-forward" />
       </View>
-      <View className="pl-3 pr-6 flex-row mb-6">
-        <View className="flex-row w-full items-center">
-          <MaterialIcons size={20} color="#0A8791" name="logout" />
-          <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-            Logout
-          </Text>
+      <TouchableOpacity onPress={handleSignOut}>
+        <View className="pl-3 pr-6 flex-row mb-6">
+          <View className="flex-row w-full items-center">
+            <MaterialIcons size={20} color="#0A8791" name="logout" />
+            <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+              Logout
+            </Text>
+          </View>
+          <Ionicons size={28} color="#0E122B" name="chevron-forward" />
         </View>
-        <Ionicons size={28} color="#0E122B" name="chevron-forward" />
-      </View>
+      </TouchableOpacity>
       <View className="bg-LIGHT_GREEN flex-row justify-center py-6 px-3 rounded-lg mb-6">
         <FontAwesome5 name="robot" size={22} color="#FBA83C" />
         <Text

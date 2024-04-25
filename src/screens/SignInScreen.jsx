@@ -25,7 +25,9 @@ export default function SignInScreen({navigation}) {
         navigation.navigate('Admin');
       } else {
         navigation.navigate('HomeTabs');
-      }
+      } 
+      setEmail('');
+      setPassword('');
     } catch (error) {
       console.log(error.response.data);
       setErrorMessage(error.response.data.error);

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import {useState} from 'react';
-import {Separator} from '../components';
+import {Separator} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
