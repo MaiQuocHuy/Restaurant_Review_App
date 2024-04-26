@@ -2,19 +2,51 @@ import {View, Text, StatusBar, Image, StyleSheet} from 'react-native';
 import React, {useEffect} from 'react';
 import {Images} from '../constants';
 import {Display} from '../utils';
+import {getDataWithExpiration} from '../helpers/asyncStorage';
+import axios from 'axios';
 
 const SplashScreen = ({navigation}) => {
-  // Navigation to Signin screen after 2 seconds
+  const checkRoleWithToken = async idToken => {
+    try {
+      const token = await getDataWithExpiration('token');
+      if (token) {
+        const {data} = await axios.post(
+          'http://10.0.2.2:8080/api/login-with-token',
+          {
+            id: idToken,
+          },
+        );
+        if (data.role === 'admin') {
+          navigation.navigate('Admin');
+        } else {
+          navigation.navigate('HomeTabs');
+        }
+      } else {
+        navigation.navigate('Signin');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    setTimeout(() => {
-      navigation.replace('HomeTabs');
-    }, 2000);
+    getDataWithExpiration('token')
+      .then(token => {
+        if (token) {
+          console.log('Token: ', token);
+          checkRoleWithToken(token);
+        } else {
+          setTimeout(() => {
+            navigation.replace('Signin');
+          }, 2000);
+        }
+      })
+      .catch(error => {
+        setTimeout(() => {
+          navigation.replace('Signin');
+        }, 2000);
+      });
   }, []);
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     navigation.replace('Signin');
-  //   });
-  // }, []);
   return (
     <View className="flex-1 items-center justify-center bg-[#0A8791]">
       <StatusBar

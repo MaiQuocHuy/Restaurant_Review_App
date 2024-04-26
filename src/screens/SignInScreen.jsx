@@ -1,5 +1,5 @@
 import {View, Text, StatusBar, TextInput, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 
@@ -7,12 +7,21 @@ import Separator from '../components/Separator';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import ToggleButton from '../components/ToggleButton';
 import axios from 'axios';
+import {
+  getDataWithExpiration,
+  storeDataWithExpiration,
+} from '../helpers/asyncStorage';
 
 export default function SignInScreen({navigation}) {
   const [isPasswordShow, setIsPasswordShow] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const resetInput = () => {
+    setEmail('');
+    setPassword('');
+  };
 
   const login = async () => {
     try {
@@ -21,13 +30,15 @@ export default function SignInScreen({navigation}) {
         password,
       });
       console.log(data);
-      if (data.role === 'admin') {
-        navigation.navigate('Admin');
-      } else {
-        navigation.navigate('HomeTabs');
-      } 
-      setEmail('');
-      setPassword('');
+      if (data.success) {
+        resetInput();
+        if (data.role === 'Admin') {
+          navigation.navigate('Admin');
+        } else {
+          navigation.navigate('HomeTabs');
+        }
+        storeDataWithExpiration('token', data.id);
+      }
     } catch (error) {
       console.log(error.response.data);
       setErrorMessage(error.response.data.error);
