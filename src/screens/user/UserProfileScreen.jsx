@@ -1,4 +1,4 @@
-import {View, Text, Image, Button} from 'react-native';
+import {View, Text, Image, Button, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {StatusBar} from 'react-native';
 import {Separator, ToggleButton} from '../../components';
@@ -8,13 +8,14 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {removeTokenInStorage} from '../../helpers';
 export default function UserProfile({navigation}) {
   const handleSignOut = async () => {
     // sign out logic here
     const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
     console.log(data);
     if (data.success) {
+      await removeTokenInStorage('token');
       navigation.navigate('Signin');
     }
     // console.log(data);

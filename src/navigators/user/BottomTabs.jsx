@@ -3,6 +3,8 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {HomeScreen, SearchScreen, UserProfileScreen} from '../../screens';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Display} from '../../utils';
 import HomeStackScreen from './HomeStackScreen';
 import SearchStackScreen from './SearchStackScreen';

@@ -60,7 +60,7 @@ export default function HomeScreen({navigation}) {
         <View className="absolute right-1 top-0 rounded-full w-26 h-26 items-center justify-center mt-7">
           <Image
             className="w-10 h-10 rounded-full"
-            source={require('../assets/images/user_avatar.jpg')}
+            source={require('../../assets/images/user_avatar.jpg')}
           />
         </View>
         <View className="flex-row justify-evenly mt-5">

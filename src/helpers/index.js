@@ -1,3 +1,12 @@
 import {getCoordinatesFromAddress} from './location';
-
-export {getCoordinatesFromAddress};
+import {
+  storeDataWithExpiration,
+  getDataWithExpiration,
+  removeTokenInStorage,
+} from './asyncStorage';
+export {
+  getCoordinatesFromAddress,
+  storeDataWithExpiration,
+  getDataWithExpiration,
+  removeTokenInStorage,
+};

@@ -2,29 +2,9 @@ import {View, Text, TextInput, StatusBar, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LottieView from 'lottie-react-native';
 import {Images} from '../constants';
 import {Separator} from '../components';
 import axios from 'axios';
-
-const inputStyle = state => {
-  switch (state) {
-    case 'valid':
-      return {
-        ...styles.inputContainer,
-        borderWidth: 1,
-        borderColor: '#24C869',
-      };
-    case 'invalid':
-      return {
-        ...styles.inputContainer,
-        borderWidth: 1,
-        borderColor: '#F53920',
-      };
-    default:
-      return styles.inputContainer;
-  }
-};
 
 export default function SignUpScreen({navigation}) {
   const [username, setUsername] = useState('');
@@ -32,6 +12,12 @@ export default function SignUpScreen({navigation}) {
   const [password, setPassword] = useState('');
   const [isPasswordShow, setIsPasswordShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const resetInput = () => {
+    setUsername('');
+    setEmail('');
+    setPassword('');
+  };
 
   const register = async () => {
     const user = {
@@ -46,6 +32,10 @@ export default function SignUpScreen({navigation}) {
         password,
       });
       console.log(data);
+      if (data.success) {
+        resetInput();
+        navigation.navigate('Signin');
+      }
     } catch (error) {
       console.log(error);
     }
