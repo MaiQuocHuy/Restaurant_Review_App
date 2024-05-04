@@ -1,8 +1,8 @@
 const dataTypeRestaurant = [
-  {label: 'French restaurant', value: 'frenchrestaurant'},
-  {label: 'Italian restaurant', value: 'italianrestaurant'},
-  {label: 'German restaurant', value: 'germanrestaurant'},
-  {label: 'Chinese restaurant', value: 'chineserestaurant'},
+  {label: 'Asian restaurant', value: 'asianrestaurant'},
+  {label: 'European restaurant', value: 'europeanrestaurant'},
+  {label: 'American restaurant', value: 'americanrestaurant'},
+  {label: 'African restaurant', value: 'africanrestaurant'},
 ];
 
 const dataCountry = [
@@ -22,4 +22,7 @@ const dataTypeDish = [
   {label: 'Breakfast', value: 'breakfast'},
 ];
 
-export {dataTypeRestaurant, dataCountry, dataTypeDish};
+const longitude = 108.252355;
+const latitude = 15.9752931;
+
+export {dataTypeRestaurant, dataCountry, dataTypeDish, longitude, latitude};

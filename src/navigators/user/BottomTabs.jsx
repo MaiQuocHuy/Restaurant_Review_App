@@ -10,6 +10,7 @@ import HomeStackScreen from './HomeStackScreen';
 import SearchStackScreen from './SearchStackScreen';
 import ProfileStackScreen from './ProfileStackScreen';
 import PostStackScreen from './PostStackScreen';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 
 export default function BottomTabs() {
   const BottomTabs = createBottomTabNavigator();
@@ -28,8 +29,7 @@ export default function BottomTabs() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: '#0A8791',
         tabBarInactiveTintColor: '#A3A3A3',
-      }}
-      op>
+      }}>
       <BottomTabs.Screen
         name="HomeStack"
         component={HomeStackScreen}

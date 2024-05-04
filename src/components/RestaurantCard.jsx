@@ -3,7 +3,6 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function RestaurantCard({navigate, ...props}) {
-  console.log('Props', props);
   return (
     <TouchableOpacity
       className="flex-1 justify-center bg-DEFAULT_WHITE rounded-xl shadow-lg mb-5"

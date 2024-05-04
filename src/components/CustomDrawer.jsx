@@ -15,15 +15,21 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
+import {removeTokenInStorage} from '../helpers/asyncStorage';
 
 const CustomDrawer = props => {
   const navigation = useNavigation();
   const handleSignOut = async () => {
     // sign out logic here
-    const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
-    console.log(data);
-    if (data.success) {
-      navigation.navigate('Signin');
+    try {
+      const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
+      console.log(data);
+      removeTokenInStorage('token');
+      if (data.success) {
+        navigation.navigate('Signin');
+      }
+    } catch (error) {
+      console.log('Error signout', error);
     }
     // console.log(data);
   };

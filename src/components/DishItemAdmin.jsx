@@ -57,17 +57,7 @@ const DishItemAdmin = ({item, index, handleEdit, handleDelete}) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <Dialog.Container visible={visible}>
-        <Dialog.Title>Account delete</Dialog.Title>
-        <Dialog.Description>
-          Do you want to delete this account? You cannot undo this action.
-        </Dialog.Description>
-        <Dialog.Button label="Cancel" onPress={() => handleCancelModal()} />
-        <Dialog.Button
-          label="Delete"
-          onPress={() => handleDeleteModal(item._id)}
-        />
-      </Dialog.Container>
+    
     </View>
   );
 };
