@@ -9,7 +9,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
 import {removeTokenInStorage} from '../../helpers';
+import {useEffect} from 'react';
+import {useState} from 'react';
+import {Images} from '../../constants';
+import {useIsFocused} from '@react-navigation/native';
 export default function UserProfile({navigation}) {
+  const [user, setUser] = useState(null);
+  const isFocused = useIsFocused();
   const handleSignOut = async () => {
     // sign out logic here
     const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
@@ -18,8 +24,20 @@ export default function UserProfile({navigation}) {
       await removeTokenInStorage('token');
       navigation.navigate('Signin');
     }
-    // console.log(data);
   };
+
+  const fetchProfile = async () => {
+    const {data} = await axios.get(`http://10.0.2.2:8080/api/me`);
+    console.log('Profile', data);
+    if (data.success) setUser(data.user);
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchProfile();
+    }
+  }, [isFocused]);
+
   return (
     <View className="flex-1 bg-DEFAULT_WHITE px-4 space-y-3">
       <StatusBar
@@ -28,13 +46,7 @@ export default function UserProfile({navigation}) {
         translucent
       />
       <Separator height={StatusBar.currentHeight} />
-      <View className="flex-row items-center pt-4 pb-6">
-        <Ionicons
-          name="chevron-back-outline"
-          size={30}
-          color="#000"
-          onPress={() => navigation.goBack()}
-        />
+      <View className="flex-row items-center pt-4  justify-center">
         <Text className="text-xl font-POPPINS_MEDIUM w-[80%] text-center text-DEFAULT_BLACK">
           Profile
         </Text>
@@ -43,32 +55,28 @@ export default function UserProfile({navigation}) {
         <Image
           className="w-16 h-16 rounded-full"
           source={{
-            uri: 'https://as1.ftcdn.net/v2/jpg/03/24/73/92/1000_F_324739203_keeq8udvv0P2h1MLYJ0GLSlTBagoXS48.jpg',
+            uri:
+              user?.image?.url ||
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/480px-User-avatar.svg.png',
           }}
         />
         <View className="flex-1 gap-1">
           <Text className="text-lg font-POPPINS_MEDIUM text- decoration-DEFAULT_BLACK">
-            Maihuymap
+            {user?.name}
           </Text>
           <Text className="text-base font-POPPINS_REGULAR text-DEFAULT_GREY">
-            maiquochuy@gmail.com
+            {user?.email}
           </Text>
         </View>
       </View>
-      <View className="bg-DEFAULT_GREEN justify-center items-center p-2 rounded-lg mb-6">
-        <Text className="text-DEFAULT_WHITE font-POPPINS_MEDIUM text-lg">
-          Edit Profile
-        </Text>
-      </View>
-      <View className="pl-2 pr-6 flex-row mb-6">
-        <View className="flex-row w-full items-center">
-          <Entypo size={24} color="#0A8791" name="location" />
-          <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-            My Address
+      <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
+        <View className="bg-DEFAULT_GREEN justify-center items-center p-2 rounded-lg mb-6">
+          <Text className="text-DEFAULT_WHITE font-POPPINS_MEDIUM text-lg">
+            Edit Profile
           </Text>
         </View>
-        <Ionicons size={28} color="#0E122B" name="chevron-forward" />
-      </View>
+      </TouchableOpacity>
+
       <View className="pl-2 pr-14 flex-row mb-6">
         <View className="flex-row w-full items-center">
           <Ionicons size={26} color="#0A8791" name="notifications" />
@@ -87,15 +95,17 @@ export default function UserProfile({navigation}) {
         </View>
         <Ionicons size={28} color="#0E122B" name="chevron-forward" />
       </View>
-      <View className="pl-3 pr-6 flex-row mb-6">
-        <View className="flex-row w-full items-center">
-          <FontAwesome size={26} color="#0A8791" name="bookmark" />
-          <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-            BookMarked
-          </Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Bookmarked')}>
+        <View className="pl-3 pr-6 flex-row mb-6">
+          <View className="flex-row w-full items-center">
+            <FontAwesome size={26} color="#0A8791" name="bookmark" />
+            <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+              BookMarked
+            </Text>
+          </View>
+          <Ionicons size={28} color="#0E122B" name="chevron-forward" />
         </View>
-        <Ionicons size={28} color="#0E122B" name="chevron-forward" />
-      </View>
+      </TouchableOpacity>
       <TouchableOpacity onPress={handleSignOut}>
         <View className="pl-3 pr-6 flex-row mb-6">
           <View className="flex-row w-full items-center">

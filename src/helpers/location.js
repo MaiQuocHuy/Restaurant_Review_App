@@ -7,6 +7,7 @@ export async function getCoordinatesFromAddress(address, AccessToken) {
     );
     const data = await response.json();
 
+    console.log(data);
     // Extract coordinates from the first result
     if (data.features.length > 0) {
       const coordinates = data.features[0].center;

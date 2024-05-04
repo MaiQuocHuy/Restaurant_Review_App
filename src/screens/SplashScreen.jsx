@@ -8,24 +8,22 @@ import axios from 'axios';
 const SplashScreen = ({navigation}) => {
   const checkRoleWithToken = async idToken => {
     try {
-      const token = await getDataWithExpiration('token');
-      if (token) {
-        const {data} = await axios.post(
-          'http://10.0.2.2:8080/api/login-with-token',
-          {
-            id: idToken,
-          },
-        );
-        if (data.role === 'admin') {
-          navigation.navigate('Admin');
-        } else {
-          navigation.navigate('HomeTabs');
-        }
+      const {data} = await axios.post(
+        'http://10.0.2.2:8080/api/login-with-token',
+        {
+          id: idToken,
+        },
+      );
+
+      if (data.role === 'ownrestaurant') {
+        navigation.navigate('Ownres');
       } else {
-        navigation.navigate('Signin');
+        navigation.navigate('HomeTabs');
       }
     } catch (error) {
-      console.log(error);
+      setTimeout(() => {
+        navigation.replace('Signin');
+      }, 2000);
     }
   };
 

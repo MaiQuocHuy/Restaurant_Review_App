@@ -11,12 +11,14 @@ import {
 import React, {useEffect} from 'react';
 import {Separator} from '../../components';
 import DropdownComponent from '../../components/DropdownComponent';
-import {dataCountry, dataTypeRestaurant} from '../../utils';
+import {dataTypeRestaurant} from '../../utils';
 import GooglePlacesInput from '../../components/GooglePlacesInput';
 import {useState} from 'react';
 import DatePicker from 'react-native-date-picker';
 import {launchImageLibrary} from 'react-native-image-picker';
 import axios from 'axios';
+import DocumentPicker from 'react-native-document-picker';
+import {useIsFocused} from '@react-navigation/native';
 
 const ManageRestaurantProfileScreen = ({navigation}) => {
   console.log('ManageRestaurantProfileScreen');
@@ -26,7 +28,6 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
   const [nameRes, setNameRes] = useState('');
   const [descriptionRes, setDescriptionRes] = useState('');
   const [typeRes, setTypeRes] = useState('');
-  const [country, setCountry] = useState('');
   const [streetAddress, setStreetAddress] = useState('');
   const [photo, setPhoto] = useState(null);
   const [date, setDate] = useState(new Date());
@@ -40,30 +41,34 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
   const [isFocusDescription, setIsFocusDescription] = useState(false);
   const [isFocusPhone, setIsFocusPhone] = useState(false);
   const [isFocusType, setIsFocusType] = useState(false);
-  const [isFocusCountry, setIsFocusCountry] = useState(false);
   const [isFocusStreetAddress, setIsFocusStreetAddress] = useState(false);
+  const isFocused = useIsFocused();
 
+  const fetchData = async () => {
+    try {
+      const {data} = await axios.get(
+        'http://10.0.2.2:8080/api/admin/restaurant/show',
+      );
+      console.log('Data fetch: ', data);
+      if (data.success) {
+        updateValue(data);
+        setTextButtom('Update');
+      }
+    } catch (error) {
+      console.log(error.response.data);
+      if (error.response.data.success == false) {
+        console.log('Data is empty');
+        setTextButtom('Submit');
+      }
+    }
+  };
   // Effect
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const {data} = await axios.get(
-          'http://10.0.2.2:8080/api/admin/restaurant/show',
-        );
-        console.log('Data: ', data);
-        if (Object.keys(data).length === 0) {
-          console.log('Data is empty');
-          setTextButtom('Submit');
-        } else {
-          updateValue(data);
-          setTextButtom('Update');
-        }
-      } catch (error) {
-        console.log(error.response);
-      }
-    };
-    fetchData();
-  }, []);
+    if (isFocused) {
+      console.log('Running');
+      fetchData();
+    }
+  }, [isFocused]);
 
   const updateValue = data => {
     const dataRes = data.restaurant;
@@ -71,9 +76,9 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
     const endTime = dataRes.timeWork.end;
     const newTime = `${startTime} AM - ${endTime} PM`;
     // Image
+    // console.log('Data Image', dataRes);
     setNameRes(dataRes.name);
     setDescriptionRes(dataRes.description);
-    setCountry(dataRes.country);
     setPhone(dataRes.phone);
     setTypeRes(dataRes.type);
     setStreetAddress(dataRes.address);
@@ -88,33 +93,33 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
     return <Text style={styles.label}>{title}</Text>;
   };
 
-  const handleChoosePhoto = () => {
-    launchImageLibrary({noData: true}, response => {
-      console.log(response);
-      setImageSource({uri: response.assets[0].uri});
-      setPhoto(response);
-    });
+  const handleChoosePhoto = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
+      });
+
+      console.log('uri', res[0].uri); // res.uri is the URI of the selected file
+      const image = res[0];
+      setImageSource({uri: image.uri});
+      setPhoto(image);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker
+        return;
+      } else {
+        throw err;
+      }
+    }
   };
 
   const handleSubmit = async () => {
     console.log('Submit');
-    console.log(
-      'Data Full',
-      nameRes,
-      descriptionRes,
-      typeRes,
-      country,
-      streetAddress,
-      time,
-      photo,
-      phone,
-    );
 
     if (
       !nameRes ||
       !descriptionRes ||
       !typeRes ||
-      !country ||
       !streetAddress ||
       !time ||
       !photo ||
@@ -131,12 +136,11 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
         formData.append('name', nameRes);
         formData.append('description', descriptionRes);
         formData.append('type', typeRes);
-        formData.append('country', country);
         formData.append('address', streetAddress);
         formData.append('timeWork', time);
         formData.append('phone', phone);
         formData.append('image', {
-          uri: photo.url,
+          uri: photo.url || photo.uri,
           type: 'image/*',
           name: Math.random().toString(36).substring(2, 8),
         });
@@ -152,18 +156,29 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
         console.log('Update', data);
       } else {
         const formData = new FormData();
+        console.log('Submit');
+        console.log(
+          'Data Full',
+          nameRes,
+          descriptionRes,
+          typeRes,
+          streetAddress,
+          time,
+          photo,
+          phone,
+        );
         formData.append('name', nameRes);
         formData.append('description', descriptionRes);
         formData.append('type', typeRes);
-        formData.append('country', country);
         formData.append('address', streetAddress);
         formData.append('timeWork', time);
         formData.append('phone', phone);
         formData.append('image', {
-          uri: photo.assets[0].uri,
-          type: photo.assets[0].type,
-          name: photo.assets[0].fileName,
+          uri: photo.uri,
+          type: photo.type,
+          name: photo.name,
         });
+
         const {data} = await axios.post(
           'http://10.0.2.2:8080/api/restaurant/create',
           formData, // send formData directly, not wrapped in an object
@@ -173,13 +188,13 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
             },
           },
         );
+        console.log('Create', data);
         if (data) {
           setTextButtom('Update');
         }
-        console.log('Create', data);
       }
     } catch (error) {
-      console.log(error.response);
+      console.log('Error', error);
     }
   };
 
@@ -263,18 +278,7 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
             setValue={setTypeRes}
           />
         </View>
-        <View style={styles.input}>
-          <Text style={styles.inputTitle}>Country (*)</Text>
-          {isFocusCountry && renderLabel('Country (*)')}
-          <DropdownComponent
-            data={dataCountry}
-            title={'Country'}
-            value={country}
-            setValue={setCountry}
-            setIsFocus={setIsFocusCountry}
-            isFocus={isFocusCountry}
-          />
-        </View>
+
         <View style={styles.input}>
           <Text style={styles.inputTitle}>Address Restaurant (*)</Text>
           {isFocusStreetAddress && renderLabel('Address (*)')}
@@ -282,6 +286,7 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
             setStreetAddress={setStreetAddress}
             isFocusStreetAddress={isFocusStreetAddress}
             value={streetAddress}
+            setIsFocusStreetAddress={setIsFocusDescription}
           />
         </View>
         <View style={styles.input}>

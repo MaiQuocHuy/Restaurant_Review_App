@@ -5,7 +5,23 @@ import {Images} from '../constants';
 import {Display} from '../utils';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default function RestaurantMediumCard() {
+export default function RestaurantMediumCard({navigation, ...props}) {
+  console.log('Props', props);
+  const getType = type => {
+    switch (type) {
+      case 'asianrestaurant':
+        return 'Asian';
+      case 'europeanrestaurant':
+        return 'European';
+      case 'americanrestaurant':
+        return 'American';
+      case 'africanrestaurant':
+        return 'African';
+      default:
+        return '';
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View>
@@ -19,11 +35,11 @@ export default function RestaurantMediumCard() {
       <View style={styles.labelContainer}>
         <View style={styles.titleContainer}>
           <Text style={styles.titleText} className="font-POPPINS_BOLD">
-            SLkdad
+            {props.name}
           </Text>
         </View>
         <Text style={styles.tagsText} className="font-POPPINS_MEDIUM">
-          Burogr
+          {getType(props.type)}
         </Text>
         <Ionicons
           name="bookmark"

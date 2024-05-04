@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const storeDataWithExpiration = async (key, value) => {
   try {
     const expirationDate = new Date();
-    expirationDate.setMonth(expirationDate.getMonth() + 1); // Add one month
+    expirationDate.setDate(expirationDate.getDate() + 7); // Add one week
     const item = {
       value: value,
       expiration: expirationDate.getTime(),

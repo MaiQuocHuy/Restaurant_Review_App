@@ -19,6 +19,7 @@ export default function SignInScreen({navigation}) {
   const [password, setPassword] = useState('');
 
   const resetInput = () => {
+    console.log('Reset');
     setEmail('');
     setPassword('');
   };
@@ -32,8 +33,8 @@ export default function SignInScreen({navigation}) {
       console.log(data);
       if (data.success) {
         resetInput();
-        if (data.role === 'Admin') {
-          navigation.navigate('Admin');
+        if (data.role === 'ownrestaurant') {
+          navigation.navigate('Ownres');
         } else {
           navigation.navigate('HomeTabs');
         }
@@ -41,6 +42,8 @@ export default function SignInScreen({navigation}) {
       }
     } catch (error) {
       console.log(error.response.data);
+      resetInput();
+      navigation.navigate('Signin');
       setErrorMessage(error.response.data.error);
     }
   };
@@ -77,6 +80,7 @@ export default function SignInScreen({navigation}) {
               setErrorMessage('');
               setEmail(text);
             }}
+            value={email}
           />
         </View>
       </View>
@@ -95,6 +99,7 @@ export default function SignInScreen({navigation}) {
               setErrorMessage('');
               setPassword(text);
             }}
+            value={password}
           />
           <Feather
             name={isPasswordShow ? 'eye' : 'eye-off'}

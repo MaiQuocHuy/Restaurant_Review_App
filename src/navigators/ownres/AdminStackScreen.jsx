@@ -10,10 +10,11 @@ import {
   ManageRestaurantProfileScreen,
 } from '../../screens';
 import MenuDishStackScreen from './MenuDishStackScreen';
+import OverviewRestaurant from '../../screens/ownres/OverviewRestaurant';
 
 const Drawer = createDrawerNavigator();
 
-const AdminStackScreen = () => {
+const OwnresStackScreen = () => {
   return (
     <Drawer.Navigator
       drawerContent={props => <CustomDrawer {...props} />}
@@ -27,6 +28,15 @@ const AdminStackScreen = () => {
           fontSize: 15,
         },
       }}>
+      <Drawer.Screen
+        name="OverView Restaurant"
+        component={OverviewRestaurant}
+        options={{
+          drawerIcon: ({color}) => (
+            <Ionicons name="chatbox-ellipses-outline" size={22} color={color} />
+          ),
+        }}
+      />
       <Drawer.Screen
         name="Manage Profile Restaurant"
         component={ManageRestaurantProfileScreen}
@@ -45,17 +55,8 @@ const AdminStackScreen = () => {
           ),
         }}
       />
-      <Drawer.Screen
-        name="Manage Post Restaurant"
-        component={ManagePostScreen}
-        options={{
-          drawerIcon: ({color}) => (
-            <Ionicons name="chatbox-ellipses-outline" size={22} color={color} />
-          ),
-        }}
-      />
     </Drawer.Navigator>
   );
 };
 
-export default AdminStackScreen;
+export default OwnresStackScreen;

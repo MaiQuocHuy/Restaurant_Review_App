@@ -11,7 +11,7 @@ import RestaurantMenuScreen from './user/RestaurantMenuScreen';
 import RestaurantReviewScreen from './user/RestaurantReviewScreen';
 import ManageRestaurantProfileScreen from './ownres/ManageRestaurantProfileScreen';
 import ManageMenuDishScreen from './ownres/ManageMenuDishScreen';
-import ManagePostScreen from './ownres/ManagePostScreen';
+import ManagePostScreen from './ownres/OverviewRestaurant';
 export {
   HomeScreen,
   SplashScreen,

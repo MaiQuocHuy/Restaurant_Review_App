@@ -17,4 +17,9 @@ export default {
   MARKER: require('../assets/images/marker.png'),
   EMPTY_CART: require('../assets/images/empty_cart.png'),
   AVATAR: require('../assets/images/user_avatar.jpg'),
+  SALAD: require('../assets/images/salad.png'),
+  SOUP: require('../assets/images/soup.png'),
+  APPETIZER: require('../assets/images/appetizer.png'),
+  BREAKFAST: require('../assets/images/breakfast.png'),
+  MAINCOURSE: require('../assets/images/course.png'),
 };

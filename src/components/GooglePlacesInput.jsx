@@ -1,12 +1,16 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import {StyleSheet, View} from 'react-native';
 
 import {LogBox} from 'react-native';
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested']); // Ignore log notification by message
-const GooglePlacesInput = ({setStreetAddress, isFocusStreetAddress, value}) => {
-  console.log('GooglePlacesInput', value);
+const GooglePlacesInput = ({
+  setStreetAddress,
+  isFocusStreetAddress,
+  value,
+  setIsFocusStreetAddress,
+}) => {
   return (
     <GooglePlacesAutocomplete
       disableScroll={true}
@@ -15,17 +19,17 @@ const GooglePlacesInput = ({setStreetAddress, isFocusStreetAddress, value}) => {
         // 'details' is provided when fetchDetails = true
         console.log('Data:', data);
         setStreetAddress(data.description);
-        console.log('Details:', details);
       }}
       textInputProps={{
-        onChange: newText => {
-          console.log(newText);
-          setStreetAddress(newText);
+        onChangeText: text => {
+          if (text !== '') {
+            setStreetAddress(text);
+          }
         },
+        onFocus: () => setIsFocusStreetAddress(true),
+        onBlur: () => setIsFocusStreetAddress(false),
         value: value,
       }}
-      returnKeyType={'default'}
-      fetchDetails={true}
       styles={{
         textInputContainer: {
           width: '100%',
@@ -46,9 +50,6 @@ const GooglePlacesInput = ({setStreetAddress, isFocusStreetAddress, value}) => {
               borderWidth: 1,
               borderColor: '#C2C2CB',
             },
-        predefinedPlacesDescription: {
-          color: '#000',
-        },
       }}
       query={{
         key: 'AIzaSyCFgrivo6_Va0_t8BS8Mi2rfuFCC9cduQg',
