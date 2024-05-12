@@ -22,4 +22,5 @@ export default {
   APPETIZER: require('../assets/images/appetizer.png'),
   BREAKFAST: require('../assets/images/breakfast.png'),
   MAINCOURSE: require('../assets/images/course.png'),
+  VOUCHER: require('../assets/images/voucher.png'),
 };

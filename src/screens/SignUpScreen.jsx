@@ -12,7 +12,7 @@ export default function SignUpScreen({navigation}) {
   const [password, setPassword] = useState('');
   const [isPasswordShow, setIsPasswordShow] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState('');
   const resetInput = () => {
     setUsername('');
     setEmail('');
@@ -37,6 +37,7 @@ export default function SignUpScreen({navigation}) {
         navigation.navigate('Signin');
       }
     } catch (error) {
+      setErrorMessage(error.response.data.error);
       console.log(error);
     }
   };
@@ -138,6 +139,9 @@ export default function SignUpScreen({navigation}) {
           />
         </View>
       </View>
+      <Text className="text-base text-DEFAULT_RED font-POPPINS_MEDIUM text-center pt-4 pb-0">
+        {errorMessage != '' && errorMessage}
+      </Text>
       {/* <Text className="text-base text-DEFAULT_RED font-POPPINS_MEDIUM mx-5 my-[8px]">
         Email Error
       </Text> */}

@@ -10,6 +10,8 @@ import {
 import BottomTabs from './user/BottomTabs';
 import AdminStackScreen from './ownres/AdminStackScreen';
 import OwnresStackScreen from './ownres/AdminStackScreen';
+import VerifyResetPasswordScreen from '../screens/VerifyResetPasswordScreen';
+import UpdatePassword from '../screens/UpdatePassword';
 const Stack = createNativeStackNavigator();
 const Navigators = () => {
   return (
@@ -19,6 +21,11 @@ const Navigators = () => {
         <Stack.Screen name="Signin" component={SignInScreen} />
         <Stack.Screen name="Signup" component={SignUpScreen} />
         <Stack.Screen name="Forgot" component={ForgotPasswordScreen} />
+        <Stack.Screen
+          name="VerifyResetPassword"
+          component={VerifyResetPasswordScreen}
+        />
+        <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
         <Stack.Screen name="HomeTabs" component={BottomTabs} />
         <Stack.Screen name="Ownres" component={OwnresStackScreen} />
       </Stack.Navigator>

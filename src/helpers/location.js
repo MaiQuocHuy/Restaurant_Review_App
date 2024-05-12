@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export async function getCoordinatesFromAddress(address, AccessToken) {
   try {
     const response = await fetch(
@@ -42,11 +44,19 @@ export function getDistanceInKm(lat1, lon1, lat2, lon2) {
 function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
+const AccessToken =
+  'pk.eyJ1IjoibWFpaHV5bWFwMTIzIiwiYSI6ImNsdmR0ZTloazAybDcyaXBweGp0ZmQ0eDYifQ.Umosc-ZzdKZOI6CKCCs8rA';
 
-/*
-if (distance < 1) {
-  console.log((distance * 1000).toFixed(2) + ' m');
-} else {
-  console.log(distance.toFixed(2) + ' km');
-}
-*/
+export const fetchAddress = async (latitude, longitude) => {
+  // https://api.mapbox.com/search/geocode/v6/reverse?longitude={longitude}&latitude={latitude}&limit=1&access_token={AccessToken}
+  try {
+    const response = await axios.get(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${AccessToken}`,
+    );
+    console.log('response', response);
+    const address = response.data.features[0]?.place_name;
+    return address;
+  } catch (error) {
+    console.error(error);
+  }
+};

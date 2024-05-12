@@ -15,16 +15,22 @@ import {dataTypeDish} from '../../utils/data';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {launchImageLibrary} from 'react-native-image-picker';
 import axios from 'axios';
+import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
+import {useContext} from 'react';
+import Spinner from '../../components/Spinner';
 
 const AddDishScreen = ({navigation, route}) => {
   const idDish = route.params ? route.params.idDish : null;
-  console.log('IdDish', idDish);
+
+  const {dishes, setDishes, originalDishes, setOriginalDishes} = useContext(
+    dataOwnresGlobalContext,
+  );
   const [nameDish, setNameDish] = useState();
   const [typeDish, setTypeDish] = useState();
   const [priceDish, setPriceDish] = useState();
   const [imageSource, setImageSource] = useState(null);
   const [photo, setPhoto] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   //
   const [textButton, setTextButton] = useState('Submit');
   //focus
@@ -34,19 +40,20 @@ const AddDishScreen = ({navigation, route}) => {
   const [isFocusPhoto, setIsFocusPhoto] = useState(false);
 
   // fetchData If Edit
-  const fetchData = async () => {
-    const {data} = await axios.get(`http://10.0.2.2:8080/api/dish/${idDish}`);
-    if (data.success) {
-      console.log('Data', data);
-      const item = data.menuItem;
-      console.log('Item', item);
-      setNameDish(item.nameDish);
-      setTypeDish(item.typeDish);
-      setPriceDish(item.priceDish);
-      setImageSource({uri: item.image.url});
-      setPhoto(item.image);
-    }
-  };
+  // const fetchData = async () => {
+  //   const {data} = await axios.get(`http://10.0.2.2:8080/api/dish/${idDish}`);
+  //   if (data.success) {
+  //     console.log('Data', data);
+  //     const item = data.menuItem;
+  //     console.log('Item', item);
+  //     setNameDish(item.nameDish);
+  //     setTypeDish(item.typeDish);
+  //     setPriceDish(item.priceDish);
+  //     setImageSource({uri: item.image.url});
+  //     console.log('Image', item.image);
+  //     setPhoto(item.image);
+  //   }
+  // };
 
   const resetTest = async () => {
     setNameDish('');
@@ -67,60 +74,85 @@ const AddDishScreen = ({navigation, route}) => {
   };
 
   const handleSubmit = async () => {
-    if (textButton === 'Update') {
-      console.log('Update');
-      const formData = new FormData();
-      formData.append('nameDish', nameDish);
-      formData.append('typeDish', typeDish);
-      formData.append('priceDish', priceDish);
-      formData.append('image', {
-        uri: photo.url,
-        type: 'image/*',
-        name: Math.random().toString(36).substring(2, 8),
-      });
-      const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/menu/update/dish/${idDish}`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        },
-      );
-      if (data.success) {
-        console.log('Update', data);
-        resetTest();
-        navigation.navigate('MenuDish');
+    try {
+      if (!nameDish || !typeDish || !priceDish || !photo) {
+        alert('Please fill all the fields');
+        return;
       }
-    } else {
-      console.log('Submit');
-      console.log('Name Dish', nameDish);
-      console.log('Type Dish', typeDish);
-      console.log('Price Dish', priceDish);
-      console.log('Photo', photo);
-      const formData = new FormData();
-      formData.append('nameDish', nameDish);
-      formData.append('typeDish', typeDish);
-      formData.append('priceDish', priceDish);
-      formData.append('image', {
-        uri: photo.assets[0].uri,
-        type: photo.assets[0].type,
-        name: photo.assets[0].fileName,
-      });
-      const {data} = await axios.post(
-        'http://10.0.2.2:8080/api/menu/create',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+      setLoading(true);
+      if (textButton === 'Update') {
+        console.log('Update');
+        console.log(photo);
+        const formData = new FormData();
+        formData.append('nameDish', nameDish);
+        formData.append('typeDish', typeDish);
+        formData.append('priceDish', priceDish);
+        formData.append('image', {
+          uri: photo.url || photo.assets[0].uri,
+          type: 'image/*',
+          name: Math.random().toString(36).substring(2, 8),
+        });
+        const {data} = await axios.put(
+          `http://10.0.2.2:8080/api/menu/update/dish/${idDish}`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        },
-      );
-      if (data.success) {
-        console.log('Create Dish', data);
-        resetTest();
-        navigation.navigate('MenuDish');
+        );
+        if (data.success) {
+          console.log('Update', data);
+          resetTest();
+          setDishes(prevDishes =>
+            prevDishes.map(dish =>
+              dish._id === data.menu._id ? data.menu : dish,
+            ),
+          );
+          setOriginalDishes(prevDishes =>
+            prevDishes.map(dish =>
+              dish._id === data.menu._id ? data.menu : dish,
+            ),
+          );
+          navigation.navigate('MenuDish');
+        }
+      } else {
+        console.log('Submit');
+        console.log('Name Dish', nameDish);
+        console.log('Type Dish', typeDish);
+        console.log('Price Dish', priceDish);
+        console.log('Photo', photo);
+        const formData = new FormData();
+        formData.append('nameDish', nameDish);
+        formData.append('typeDish', typeDish);
+        formData.append('priceDish', priceDish);
+        formData.append('image', {
+          uri: photo.assets[0].uri,
+          type: photo.assets[0].type,
+          name: photo.assets[0].fileName,
+        });
+        const {data} = await axios.post(
+          'http://10.0.2.2:8080/api/menu/create',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+        if (data.success) {
+          console.log('Create Dish', data);
+          setDishes(prevDishes => [...prevDishes, data.menuItem]);
+          setOriginalDishes(prevDishes => [...prevDishes, data.menuItem]);
+          alert('Create dish successfully');
+          resetTest();
+          navigation.navigate('MenuDish');
+        }
       }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,8 +163,15 @@ const AddDishScreen = ({navigation, route}) => {
 
   useEffect(() => {
     if (idDish) {
-      fetchData();
+      // fetchData();
       setTextButton('Update');
+      const dish = dishes.find(dish => dish._id === idDish);
+      console.log('Dish', dish);
+      setNameDish(dish.nameDish);
+      setTypeDish(dish.typeDish);
+      setPriceDish(dish.priceDish.toString());
+      setImageSource({uri: dish.image.url});
+      setPhoto(dish.image);
     }
   }, []);
 
@@ -175,7 +214,7 @@ const AddDishScreen = ({navigation, route}) => {
           <Text style={styles.inputTitle}>Type Dish (*)</Text>
           {isFocusType && renderLabel('Type dish (*)')}
           <DropdownComponent
-            data={dataTypeDish}
+            data={dataTypeDish.slice(1)}
             title={'Type Dish'}
             value={typeDish}
             setValue={setTypeDish}
@@ -203,7 +242,11 @@ const AddDishScreen = ({navigation, route}) => {
         <View style={styles.input}>
           <Text style={styles.inputTitle}>Photo Restaurant</Text>
           <TouchableOpacity onPress={handleChoosePhoto}>
-            <Text style={styles.inputFile}>Choose Photo</Text>
+            <Text style={styles.inputFile}>
+              {photo
+                ? photo?.public_id || photo?.assets[0]?.fileName
+                : 'Choose Photo'}
+            </Text>
           </TouchableOpacity>
           {imageSource && (
             <View
@@ -216,20 +259,24 @@ const AddDishScreen = ({navigation, route}) => {
             </View>
           )}
         </View>
-        <TouchableOpacity onPress={() => handleSubmit()}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: '#8200d6',
-              padding: 4,
-              margin: 4,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 10,
-            }}>
-            <Text style={styles.button}>{textButton}</Text>
-          </View>
-        </TouchableOpacity>
+        {loading ? (
+          <Spinner width={'100%'} height={60} />
+        ) : (
+          <TouchableOpacity onPress={() => handleSubmit()}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: '#8200d6',
+                padding: 4,
+                margin: 4,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+              }}>
+              <Text style={styles.button}>{textButton}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );

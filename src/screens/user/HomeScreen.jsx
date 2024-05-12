@@ -17,56 +17,121 @@ import RestaurantCard from '../../components/RestaurantCard';
 import RestaurantMediumCard from '../../components/RestaurantMediumCard';
 import axios from 'axios';
 import {useIsFocused} from '@react-navigation/native';
+import Spinner from '../../components/Spinner';
+import {fetchAddress} from '../../helpers/location';
+import {useContext} from 'react';
+import {UserLocationContext} from '../../contexts/userLocationContext';
+import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
+import {UserContext} from '../../contexts/userContext';
+import {LogBox} from 'react-native';
 
+LogBox.ignoreLogs(['ReactImageView: Image source']);
 export default function HomeScreen({navigation}) {
-  // const [activeCategory, setActiveCategory] = useState();
+  const {restaurants, setRestaurants} = useContext(dataUserGlobalContext);
+  const {user, setUser} = useContext(UserContext);
+  const {userLocation, setUserLocation} = useContext(UserLocationContext);
+
   const [activeSortItem, setActiveSortItem] = useState('asianrestaurant');
-  const [restaurants, setRestaurants] = useState([]);
   const [restaurantsType, setRestaurantsType] = useState([]);
-  const [user, setUser] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [loadingRestaurants, setLoadingRestaurants] = useState(false);
+  const [loadingActiveSortItem, setLoadingActiveSortItem] = useState(false);
+  const [address, setAddress] = useState('');
 
-  const isFocused = useIsFocused();
-
-  const fetchRestaurnats = async () => {
-    const {data} = await axios.get('http://10.0.2.2:8080/api/restaurant/show');
-    if (data.success) {
-      setRestaurants(data.restaurants);
-      // console.log('Restaurants', data);
+  const fetchRestaurants = async () => {
+    setLoadingRestaurants(true);
+    try {
+      const {data} = await axios.get(
+        'http://10.0.2.2:8080/api/restaurant/show',
+      );
+      console.log('Data', data.restaurants);
+      if (data.success) {
+        setRestaurants(data.restaurants);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingRestaurants(false);
     }
   };
 
   const handleActiveSortItem = async activeItem => {
     console.log(activeItem);
+    setLoadingActiveSortItem(true);
     try {
-      const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/search/restaurant/type/${activeItem}`,
+      if (restaurants && restaurants.length > 0) {
+        setRestaurantsType(restaurants.filter(res => res.type === activeItem));
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingActiveSortItem(false);
+    }
+  };
+
+  const handleBookMark = async id => {
+    try {
+      const {data} = await axios.put(
+        `http://10.0.2.2:8080/api/restaurant/bookmark/${id}`,
       );
-      console.log('Selected Type', data);
-      setRestaurantsType(data.restaurants);
+      console.log('Bookmark', data);
+      if (data.success) {
+        console.log(restaurants);
+        const updateRestaurantBookMarked = restaurantsBookMark => {
+          return restaurantsBookMark.map(restaurant => {
+            if (restaurant._id == id) {
+              if (data.check) {
+                return {
+                  ...restaurant,
+                  bookmarks: [...restaurant.bookmarks, user._id],
+                };
+              } else {
+                return {
+                  ...restaurant,
+                  bookmarks: restaurant.bookmarks.filter(
+                    bookmark => bookmark !== user._id,
+                  ),
+                };
+              }
+            } else return restaurant;
+          });
+        };
+        setRestaurants(updateRestaurantBookMarked(restaurants));
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const fetchProfile = async () => {
-    const {data} = await axios.get(`http://10.0.2.2:8080/api/me`);
-    console.log('Profile', data);
-    if (data.success) setUser(data.user);
-  };
+  useEffect(() => {
+    if (user && user.role === 'user') fetchRestaurants();
+  }, [user]);
 
   useEffect(() => {
-    if (isFocused) {
-      fetchRestaurnats();
-      fetchProfile();
+    if (restaurants && restaurants.length > 0) {
+      setRestaurantsType(
+        restaurants.filter(res => res.type === activeSortItem),
+      );
     }
-  }, [isFocused]);
+    console.log('Render', restaurants);
+  }, [restaurants]);
 
   useEffect(() => {
     if (activeSortItem) {
       handleActiveSortItem(activeSortItem);
     }
   }, [activeSortItem]);
+
+  useEffect(() => {
+    if (userLocation) {
+      console.log('User-Location', userLocation);
+      fetchAddress(userLocation.latitude, userLocation.longitude)
+        .then(address => {
+          console.log('address', address);
+          setAddress(address);
+        })
+        .catch(error => console.error(error));
+    }
+  }, [userLocation]);
 
   return (
     <View classname="flex-1 bg-SECONDARY_WHITE">
@@ -91,7 +156,7 @@ export default function HomeScreen({navigation}) {
               className="text-DEFAULT_YELLOW w-[60%] text-base font-POPPINS_MEDIUM"
               numberOfLines={1}
               ellipsizeMode="tail">
-              {user?.address || 'Add Address'}
+              {address != '' ? address : 'Cannot get your location'}
             </Text>
           </View>
           {/* <MaterialIcons name="keyboard-arrow-down" size={30} color="#FBA83C" /> */}
@@ -99,7 +164,11 @@ export default function HomeScreen({navigation}) {
         <View className="absolute right-1 top-0 rounded-full w-26 h-26 items-center justify-center mt-7">
           <Image
             className="w-14 h-14 rounded-full"
-            source={require('../../assets/images/user_avatar.jpg')}
+            source={{
+              uri:
+                user?.image?.url ||
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/480px-User-avatar.svg.png',
+            }}
           />
         </View>
       </View>
@@ -107,28 +176,35 @@ export default function HomeScreen({navigation}) {
         <View className="flex-1">
           <View className="w-full">
             <View className="flex-row items-center justify-between mx-5 mb-1">
-              <Text className="text-DEFAULT_BLACK text-lg font-POPPINS_MEDIUM">
-                Top Rating Restaurant
+              <Text className="text-DEFAULT_WHITE text-lg font-POPPINS_MEDIUM">
+                Newest Restaurant
               </Text>
             </View>
-            <FlatList
-              data={restaurants}
-              keyExtractor={item => item?._id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              ListHeaderComponent={() => <Separator width={20} />}
-              ListFooterComponent={() => <Separator width={20} />}
-              ItemSeparatorComponent={() => <Separator width={10} />}
-              renderItem={({item}) => (
-                <RestaurantCard
-                  key={item?._id}
-                  {...item}
-                  navigate={restaurantId =>
-                    navigation.navigate('Restaurant', {restaurantId})
-                  }
-                />
-              )}
-            />
+            {loadingRestaurants ? (
+              <Spinner width={'100%'} height={1080 * 0.15} />
+            ) : (
+              <FlatList
+                data={restaurants}
+                keyExtractor={item => item?._id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ListHeaderComponent={() => <Separator width={20} />}
+                ListFooterComponent={() => <Separator width={20} />}
+                ItemSeparatorComponent={() => <Separator width={10} />}
+                renderItem={({item}) => (
+                  <RestaurantCard
+                    key={item?._id}
+                    {...item}
+                    user={user}
+                    userLocation={userLocation}
+                    handleBookMark={handleBookMark}
+                    navigate={restaurantId =>
+                      navigation.navigate('Restaurant', {restaurantId})
+                    }
+                  />
+                )}
+              />
+            )}
           </View>
           <View className="flex-row justify-evenly items-center mt-2 shadow-sm px-4">
             <TouchableOpacity
@@ -192,16 +268,23 @@ export default function HomeScreen({navigation}) {
               </Text>
             </TouchableOpacity>
           </View>
-          {restaurantsType.length > 0 &&
+          {loadingActiveSortItem ? (
+            <Spinner width={'100%'} height={1080 * 0.15} />
+          ) : (
+            restaurantsType.length > 0 &&
             restaurantsType.map((item, index) => (
               <RestaurantMediumCard
                 key={index}
                 {...item}
+                user={user}
+                userLocation={userLocation}
+                handleBookMark={handleBookMark}
                 navigate={restaurantId =>
                   navigation.navigate('Restaurant', {restaurantId})
                 }
               />
-            ))}
+            ))
+          )}
 
           <Separator height={250} />
         </View>

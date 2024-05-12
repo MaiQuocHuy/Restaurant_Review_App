@@ -57,7 +57,15 @@ const DishItemAdmin = ({item, index, handleEdit, handleDelete}) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    
+      <Dialog.Container visible={visible}>
+        <Dialog.Title>Notification</Dialog.Title>
+        <Dialog.Description>Delete this dish?</Dialog.Description>
+        <Dialog.Button
+          label="Delete"
+          onPress={() => handleDeleteModal(item._id)}
+        />
+        <Dialog.Button label="Cancel" onPress={() => handleCancelModal()} />
+      </Dialog.Container>
     </View>
   );
 };

@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Spinner from './Spinner';
 
 const CommentInput = ({
   isFocusComment,
@@ -16,6 +17,8 @@ const CommentInput = ({
   setComment,
   handleSubmit,
   user,
+  loadingComment,
+  setLoadingComment,
 }) => {
   return (
     <View className="w-[90%] mx-5 my-6">
@@ -42,14 +45,20 @@ const CommentInput = ({
           }}
           value={comment}
         />
-        <TouchableOpacity activeOpacity={0.7} onPress={handleSubmit}>
-          <FontAwesome
-            name="send-o"
-            size={26}
-            color={comment != '' ? '#0A8791' : '#C2C2CB'}
-            style={styles.sendIcon}
-          />
-        </TouchableOpacity>
+        {loadingComment ? (
+          <View style={{position: 'absolute', top: 4, right: 10}}>
+            <Spinner width={40} height={40} />
+          </View>
+        ) : (
+          <TouchableOpacity activeOpacity={0.7} onPress={handleSubmit}>
+            <FontAwesome
+              name="send-o"
+              size={30}
+              color={comment != '' ? '#0A8791' : '#C2C2CB'}
+              style={styles.sendIcon}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

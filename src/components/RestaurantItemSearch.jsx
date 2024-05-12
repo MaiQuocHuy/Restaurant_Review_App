@@ -2,7 +2,20 @@ import {View, Text, Image} from 'react-native';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 const RestaurantItemSearch = ({item}) => {
-  //   console.log('Item', item);
+  const getType = type => {
+    switch (type) {
+      case 'asianrestaurant':
+        return 'Asian';
+      case 'europeanrestaurant':
+        return 'European';
+      case 'americanrestaurant':
+        return 'American';
+      case 'africanrestaurant':
+        return 'African';
+      default:
+        return '';
+    }
+  };
   return (
     <View className="w-36 bg-DEFAULT_WHITE rounded-lg p-2 m-1 shadow-sm">
       <Image
@@ -21,7 +34,7 @@ const RestaurantItemSearch = ({item}) => {
       </Text>
       <View className="flex-row items-center gap-1 mt-1 -mb-1">
         <AntDesign name="star" size={20} color="#FBA83C" />
-        <Text>4</Text>
+        <Text> {getType(item.type)}</Text>
       </View>
     </View>
   );

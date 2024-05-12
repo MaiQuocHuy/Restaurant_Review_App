@@ -11,6 +11,7 @@ const RestaurantListSearch = ({
   restaurants,
   nearByPlace,
   userLocation,
+  navigate,
 }) => {
   const [selectedDistance, setselectedDistance] = useState(10);
 
@@ -67,10 +68,7 @@ const RestaurantListSearch = ({
         keyExtractor={item => item._id}
         horizontal={true}
         renderItem={({item, index}) => (
-          <TouchableOpacity
-            onPress={() => {
-              console.log('Coordinates: ', item.coordinates);
-            }}>
+          <TouchableOpacity onPress={() => navigate(item._id)}>
             <RestaurantItemSearch item={item} />
           </TouchableOpacity>
         )}

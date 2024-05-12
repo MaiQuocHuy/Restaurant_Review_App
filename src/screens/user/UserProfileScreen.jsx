@@ -1,5 +1,12 @@
-import {View, Text, Image, Button, TouchableOpacity} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  Image,
+  Button,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import React, {useContext} from 'react';
 import {StatusBar} from 'react-native';
 import {Separator, ToggleButton} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -7,36 +14,46 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import {removeTokenInStorage} from '../../helpers';
 import {useEffect} from 'react';
 import {useState} from 'react';
 import {Images} from '../../constants';
-import {useIsFocused} from '@react-navigation/native';
+import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
+import {UserContext} from '../../contexts/userContext';
+
 export default function UserProfile({navigation}) {
-  const [user, setUser] = useState(null);
-  const isFocused = useIsFocused();
+  const {user, setUser} = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
+
   const handleSignOut = async () => {
     // sign out logic here
-    const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
-    console.log(data);
-    if (data.success) {
-      await removeTokenInStorage('token');
-      navigation.navigate('Signin');
+    try {
+      const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
+      console.log(data);
+      if (data.success) {
+        await removeTokenInStorage('token');
+        navigation.navigate('Signin');
+      }
+    } catch (error) {
+      console.log('Error signout', error);
     }
   };
 
-  const fetchProfile = async () => {
-    const {data} = await axios.get(`http://10.0.2.2:8080/api/me`);
-    console.log('Profile', data);
-    if (data.success) setUser(data.user);
-  };
-
-  useEffect(() => {
-    if (isFocused) {
-      fetchProfile();
+  const handleVerify = async () => {
+    try {
+      if (user.verified) return alert('Your account already verified');
+      const {data} = await axios.put(
+        'http://10.0.2.2:8080/api/sendVerification',
+      );
+      console.log(data);
+      navigation.navigate('Verification');
+    } catch (error) {
+      console.log(error);
     }
-  }, [isFocused]);
+  };
 
   return (
     <View className="flex-1 bg-DEFAULT_WHITE px-4 space-y-3">
@@ -76,55 +93,105 @@ export default function UserProfile({navigation}) {
           </Text>
         </View>
       </TouchableOpacity>
-
-      <View className="pl-2 pr-14 flex-row mb-6">
-        <View className="flex-row w-full items-center">
-          <Ionicons size={26} color="#0A8791" name="notifications" />
-          <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-            Notifcations
-          </Text>
-        </View>
-        <ToggleButton size={0.7} />
-      </View>
-      <View className="pl-2 pr-6 flex-row mb-6">
-        <View className="flex-row w-full items-center">
-          <MaterialIcons size={24} color="#0A8791" name="verified-user" />
-          <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-            Vertification
-          </Text>
-        </View>
-        <Ionicons size={28} color="#0E122B" name="chevron-forward" />
-      </View>
-      <TouchableOpacity onPress={() => navigation.navigate('Bookmarked')}>
-        <View className="pl-3 pr-6 flex-row mb-6">
-          <View className="flex-row w-full items-center">
-            <FontAwesome size={26} color="#0A8791" name="bookmark" />
-            <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-              BookMarked
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <TouchableOpacity onPress={() => navigation.navigate('Notification')}>
+          <View className="pl-3 py-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <Ionicons size={26} color="#0A8791" name="notifications" />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                Notifcations
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('PostPersonal')}>
+          <View className="pl-3 py-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <FontAwesome size={26} color="#0A8791" name="bookmark" />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                PostPersonal
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleVerify}>
+          <View className="pl-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <MaterialCommunityIcons
+                size={24}
+                color={`${user?.verified ? '#0A8791' : '#FF0000'}`}
+                name="update"
+              />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                Vertification
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Bookmarked')}>
+          <View className="pl-3 py-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <FontAwesome size={26} color="#0A8791" name="bookmark" />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                BookMarked
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Voucher')}>
+          <View className="pl-3 py-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <FontAwesome6 size={26} color="#0A8791" name="disease" />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                Voucher
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('UpdatePassword', {
+              email: user?.email,
+            })
+          }>
+          <View className="pl-3 py-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <MaterialCommunityIcons size={26} color="#0A8791" name="update" />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                Update Password
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSignOut}>
+          <View className="pl-3 py-2 pr-6 flex-row mb-6">
+            <View className="flex-row w-full items-center">
+              <MaterialIcons size={20} color="#0A8791" name="logout" />
+              <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
+                Logout
+              </Text>
+            </View>
+            <Ionicons size={28} color="#0E122B" name="chevron-forward" />
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Chatbot')}>
+          <View className="bg-LIGHT_GREEN flex-row justify-center py-6 px-3 rounded-lg mb-6">
+            <FontAwesome5 name="robot" size={22} color="#FBA83C" />
+            <Text
+              className="pl-2 text-DEFAULT_YELLOW font-POPPINS_SEMI_BOLD "
+              style={{fontSize: 20}}>
+              How can we help you!
             </Text>
           </View>
-          <Ionicons size={28} color="#0E122B" name="chevron-forward" />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handleSignOut}>
-        <View className="pl-3 pr-6 flex-row mb-6">
-          <View className="flex-row w-full items-center">
-            <MaterialIcons size={20} color="#0A8791" name="logout" />
-            <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
-              Logout
-            </Text>
-          </View>
-          <Ionicons size={28} color="#0E122B" name="chevron-forward" />
-        </View>
-      </TouchableOpacity>
-      <View className="bg-LIGHT_GREEN flex-row justify-center py-6 px-3 rounded-lg mb-6">
-        <FontAwesome5 name="robot" size={22} color="#FBA83C" />
-        <Text
-          className="pl-2 text-DEFAULT_YELLOW font-POPPINS_SEMI_BOLD "
-          style={{fontSize: 20}}>
-          How can we help you!
-        </Text>
-      </View>
+        </TouchableOpacity>
+        <Separator height={60} />
+      </ScrollView>
     </View>
   );
 }
