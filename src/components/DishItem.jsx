@@ -8,14 +8,13 @@ import {
 import React from 'react';
 
 const DishItem = props => {
-  console.log(props);
   return (
     <View style={{width: '50%', flexDirection: 'row'}}>
       <View className="flex-1 flex-col m-2 rounded-lg">
         <View className="w-full p-2">
           <Image
             source={{
-              uri: props.image.url,
+              uri: props?.image?.url,
             }}
             className="w-full h-32 rounded-lg "
           />
@@ -23,15 +22,15 @@ const DishItem = props => {
         <View className="px-4 flex-col">
           {/* Title */}
           <Text className="text-base text-DEFAULT_BLACK font-POPPINS_SEMI_BOLD">
-            {props.nameDish}
+            {props?.nameDish}
           </Text>
           {/* Tags */}
           <Text className="text-sm text-DEFAULT_GRAY font-POPPINS_REGULAR">
-            {props.typeDish}
+            {props?.typeDish}
           </Text>
           {/* Price */}
           <Text className="text-lg text-DEFAULT_YELLOW font-POPPINS_SEMI_BOLD">
-            $ {props.priceDish}
+            $ {props?.priceDish}
           </Text>
         </View>
       </View>

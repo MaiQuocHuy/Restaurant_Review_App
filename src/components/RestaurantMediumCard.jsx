@@ -1,12 +1,22 @@
-import {View, Text, Image, StyleSheet} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from 'react-native';
+import React, {useEffect} from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Images} from '../constants';
 import {Display} from '../utils';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useState} from 'react';
+import * as turf from '@turf/turf';
 
 export default function RestaurantMediumCard({navigation, ...props}) {
-  console.log('Props', props);
+  const [rating, setRating] = useState(0);
+
   const getType = type => {
     switch (type) {
       case 'asianrestaurant':
@@ -22,12 +32,29 @@ export default function RestaurantMediumCard({navigation, ...props}) {
     }
   };
 
+  const calculateDistances = (center, coordinate) => {
+    const centerPoint = turf.point(center);
+    const point = turf.point(coordinate);
+    return turf.distance(centerPoint, point);
+  };
+
+  const calculateTravelTime = (distance, speed) => {
+    return distance / speed;
+  };
+
+  function formatTimeInMinutesAndSeconds(hours) {
+    const minutes = Math.floor(hours * 60);
+    return minutes + ' minutes';
+  }
+
   return (
     <View style={styles.container}>
       <View>
         <Image
           source={{
-            uri: 'https://as1.ftcdn.net/v2/jpg/03/24/73/92/1000_F_324739203_keeq8udvv0P2h1MLYJ0GLSlTBagoXS48.jpg',
+            uri:
+              props?.image?.url ||
+              'https://t4.ftcdn.net/jpg/03/16/15/47/360_F_316154790_pnHGQkERUumMbzAjkgQuRvDgzjAHkFaQ.jpg',
           }}
           style={styles.posterStyle}
         />
@@ -41,27 +68,26 @@ export default function RestaurantMediumCard({navigation, ...props}) {
         <Text style={styles.tagsText} className="font-POPPINS_MEDIUM">
           {getType(props.type)}
         </Text>
-        <Ionicons
-          name="bookmark"
-          color="#FBA83C"
-          size={24}
-          style={{
-            position: 'absolute',
-            top: -2,
-            right: 10,
-            zIndex: 10,
-          }}
-        />
+        <TouchableWithoutFeedback
+          onPress={() => props.handleBookMark(props._id)}>
+          <Ionicons
+            name="bookmark"
+            color={
+              props?.bookmarks?.length > 0 &&
+              props?.bookmarks.find(id => id == props?.user._id)
+                ? '#FBA83C'
+                : '#C2C2CB'
+            }
+            size={30}
+            style={{
+              position: 'absolute',
+              top: -2,
+              right: 10,
+              zIndex: 99,
+            }}
+          />
+        </TouchableWithoutFeedback>
         <View style={styles.deliveryDetailsContainer}>
-          <View style={styles.rowAndCenter}>
-            <FontAwesome name="star" size={14} color="#FBA83C" />
-            <Text style={styles.ratingText} className="font-POPPINS_BOLD">
-              4.2
-            </Text>
-            <Text style={styles.reviewsText} className="font-POPPINS_MEDIUM">
-              ({233})
-            </Text>
-          </View>
           <View style={styles.rowAndCenter}>
             <Image
               source={Images.DELIVERY_TIME}
@@ -70,7 +96,22 @@ export default function RestaurantMediumCard({navigation, ...props}) {
             <Text
               style={styles.deliveryDetailsText}
               className="font-POPPINS_SEMI_BOLD">
-              20 min
+              {props.userLocation &&
+                props.coordinates &&
+                props.coordinates.longitude &&
+                props.coordinates.latitude &&
+                formatTimeInMinutesAndSeconds(
+                  calculateTravelTime(
+                    calculateDistances(
+                      [
+                        props.userLocation.longitude,
+                        props.userLocation.latitude,
+                      ],
+                      [props.coordinates.longitude, props.coordinates.latitude],
+                    ).toFixed(1),
+                    40,
+                  ).toFixed(2),
+                )}
             </Text>
           </View>
           <View style={styles.rowAndCenter}>
@@ -78,7 +119,13 @@ export default function RestaurantMediumCard({navigation, ...props}) {
             <Text
               style={styles.deliveryDetailsText}
               className="font-POPPINS_SEMI_BOLD">
-              150m
+              {props.userLocation &&
+                props.coordinates &&
+                calculateDistances(
+                  [props.userLocation.longitude, props.userLocation.latitude],
+                  [props.coordinates.longitude, props.coordinates.latitude],
+                ).toFixed(1)}{' '}
+              km
             </Text>
           </View>
         </View>

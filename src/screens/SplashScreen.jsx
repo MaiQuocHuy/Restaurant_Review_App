@@ -1,11 +1,13 @@
 import {View, Text, StatusBar, Image, StyleSheet} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Images} from '../constants';
 import {Display} from '../utils';
 import {getDataWithExpiration} from '../helpers/asyncStorage';
 import axios from 'axios';
+import {UserContext} from '../contexts/userContext';
 
 const SplashScreen = ({navigation}) => {
+  const {user, setUser} = useContext(UserContext);
   const checkRoleWithToken = async idToken => {
     try {
       const {data} = await axios.post(
@@ -15,7 +17,9 @@ const SplashScreen = ({navigation}) => {
         },
       );
 
-      if (data.role === 'ownrestaurant') {
+      console.log('Data', data.user);
+      setUser(data.user);
+      if (data.user.role === 'ownrestaurant') {
         navigation.navigate('Ownres');
       } else {
         navigation.navigate('HomeTabs');
@@ -30,6 +34,7 @@ const SplashScreen = ({navigation}) => {
   useEffect(() => {
     getDataWithExpiration('token')
       .then(token => {
+        console.log('Token: ', token);
         if (token) {
           console.log('Token: ', token);
           checkRoleWithToken(token);

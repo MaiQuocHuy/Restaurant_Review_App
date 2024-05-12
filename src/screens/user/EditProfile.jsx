@@ -12,26 +12,27 @@ import {StatusBar} from 'react-native';
 import {Separator} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
 import GooglePlacesInput from '../../components/GooglePlacesInput';
 import {useState} from 'react';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {launchImageLibrary} from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
+import Spinner from '../../components/Spinner';
+import {UserContext} from '../../contexts/userContext';
+import {useContext} from 'react';
 
 const EditProfile = ({navigation}) => {
   const [name, setName] = useState('');
-  const [streetAddress, setStreetAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [imageSource, setImageSource] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [email, setEmail] = useState('');
-
-  const [isFocusStreetAddress, setIsFocusStreetAddress] = useState(false);
+  const {user, setUser} = useContext(UserContext);
   const [isFocusName, setIsFocusName] = useState(false);
   const [isFocusPhone, setIsFocusPhone] = useState(false);
   const [isFocusImage, setIsFocusImage] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const renderLabel = title => {
     console.log('Label', title);
@@ -61,13 +62,17 @@ const EditProfile = ({navigation}) => {
   const handleSubmit = async () => {
     console.log('Submit');
     try {
-      if (!name || !streetAddress || !phone || !photo) {
+      if (!name || !phone || !photo) {
         return alert('Please fill all required fields');
       }
-      console.log('Full data', name, streetAddress, phone, photo);
+      if (!phone.match(/^[0-9]+$/) || phone.length !== 10) {
+        return alert('Phone must be a number and exactly 10 digits');
+      }
+
+      setLoading(true);
+      console.log('Full data', name, phone, photo);
       const formdata = new FormData();
       formdata.append('name', name);
-      formdata.append('address', streetAddress);
       formdata.append('phone', phone);
       formdata.append('image', {
         uri: photo.url || photo.uri,
@@ -87,40 +92,37 @@ const EditProfile = ({navigation}) => {
       );
       console.log(data);
       if (data.success) {
+        alert('Update successfully');
         const {userUpdate} = data;
+        setUser({...user, ...userUpdate});
         setName(userUpdate.name);
-        setStreetAddress(userUpdate.address);
         setPhone(userUpdate.phone);
         setImageSource({uri: userUpdate.image.url});
         setPhoto(userUpdate.image);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchUserProfile = async () => {
     console.log('Fetch user profile');
-    // Call API to get user profile
     try {
-      const {data} = await axios.get('http://10.0.2.2:8080/api/me');
-      console.log(data);
-      if (data.success) {
-        setName(data.user.name);
-        setStreetAddress(data.user.address);
-        setPhone(data.user.phone);
-        setImageSource({uri: data.user.image.url});
-        setPhoto(data.user.image);
-        setEmail(data.user.email);
-      }
+      setName(user.name);
+      setPhone(user.phone);
+      setImageSource({uri: user.image.url});
+      setPhoto(user.image);
+      setEmail(user.email);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchUserProfile();
-  }, []);
+    if (user && user.role === 'user') fetchUserProfile();
+  }, [user]);
 
   return (
     <View className="flex-1 bg-DEFAULT_WHITE">
@@ -199,15 +201,6 @@ const EditProfile = ({navigation}) => {
         </View>
 
         <View className="rounded-lg p-2 m-1">
-          {isFocusStreetAddress && renderLabel('Address (*)')}
-          <GooglePlacesInput
-            setStreetAddress={setStreetAddress}
-            isFocusStreetAddress={isFocusStreetAddress}
-            value={streetAddress}
-            setIsFocusStreetAddress={setIsFocusStreetAddress}
-          />
-        </View>
-        <View className="rounded-lg p-2 m-1">
           {isFocusPhone && renderLabel('Phone (*)')}
           <TextInput
             className={`text-base font-POPPINS_REGULAR text-DEFAULT_BLACK rounded-lg border ${
@@ -223,20 +216,24 @@ const EditProfile = ({navigation}) => {
             value={phone}
           />
         </View>
-        <TouchableOpacity onPress={() => handleSubmit()}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: '#0A8791',
-              padding: 4,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 10,
-              marginHorizontal: 12,
-            }}>
-            <Text style={styles.button}>Update</Text>
-          </View>
-        </TouchableOpacity>
+        {loading ? (
+          <Spinner width={'100%'} height={50} />
+        ) : (
+          <TouchableOpacity onPress={() => handleSubmit()}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: '#0A8791',
+                padding: 4,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                marginHorizontal: 12,
+              }}>
+              <Text style={styles.button}>Update</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </KeyboardAwareScrollView>
     </View>
   );

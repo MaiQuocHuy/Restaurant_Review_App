@@ -8,7 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import DropdownComponent from '../../components/DropdownComponent';
 import {SearchBar, Separator} from '../../components';
 import SearchComponent from '../../components/SearchComponent';
@@ -19,56 +19,123 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import axios from 'axios';
 import {useIsFocused} from '@react-navigation/native';
 import DishItemAdmin from '../../components/DishItemAdmin';
+import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
+import {debounce, set} from 'lodash';
+import {useCallback} from 'react';
+import {UserContext} from '../../contexts/userContext';
+import Spinner from '../../components/Spinner';
 
 const ManageMenuDishScreen = ({navigation}) => {
   const [nameDish, setNameDish] = useState();
   const [typeDish, setTypeDish] = useState();
   const [priceDish, setPriceDish] = useState();
-
+  const {dishes, setDishes, originalDishes, setOriginalDishes} = useContext(
+    dataOwnresGlobalContext,
+  );
   const [activeItem, setActiveItem] = useState('all');
-  const isFocused = useIsFocused();
-
-  const [items, setItems] = useState([]);
+  const [textSearch, setTextSearch] = useState('');
+  const {user, setUser} = useContext(UserContext);
+  const [loading, setLoading] = useState(false);
   // Get dishes
   const fetchDishes = async () => {
-    const {data} = await axios.get(
-      `http://10.0.2.2:8080/api/dishes/${activeItem}`,
-    );
-    if (data.success) {
-      console.log('Dishes', data.dishes);
-      setItems(data.dishes);
+    setLoading(true);
+    try {
+      const {data} = await axios.get(
+        `http://10.0.2.2:8080/api/dishes/${activeItem}`,
+      );
+      if (data.success) {
+        console.log('Dishes', data.dishes);
+        setDishes(data.dishes);
+        setOriginalDishes(data.dishes);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   // Get dish
   useEffect(() => {
-    if (isFocused) {
-      console.log('Fetch dishes', isFocused);
-      fetchDishes();
-    }
-  }, [isFocused]);
+    if (user && user.role === 'ownrestaurant') fetchDishes();
+  }, [user]);
 
   const handleEdit = idDish => {
     navigation.navigate('AddDish', {idDish});
   };
 
   const handleDelete = async idDish => {
-    const {data} = await axios.delete(
-      `http://10.0.2.2:8080/api/menu/delete/dish/${idDish}`,
-    );
-    if (data.success) {
-      console.log('Delete', idDish);
-      fetchDishes();
+    setLoading(true);
+    try {
+      const {data} = await axios.delete(
+        `http://10.0.2.2:8080/api/menu/delete/dish/${idDish}`,
+      );
+      if (data.success) {
+        console.log('Delete', idDish);
+        // fetchDishes();
+        setDishes(dishes.filter(dish => dish._id !== idDish));
+        setOriginalDishes(originalDishes.filter(dish => dish._id !== idDish));
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleChooseType = async value => {
-    console.log('Choose', value);
-    const {data} = await axios.get(`http://10.0.2.2:8080/api/dishes/${value}`);
-    if (data.success) {
-      console.log(data.dishes);
-      setItems(data.dishes);
+    setLoading(true);
+    try {
+      console.log('Choose', value);
+      if (value === 'all') {
+        setDishes(originalDishes);
+      } else {
+        const newData = originalDishes.filter(dish => dish.typeDish === value);
+        setDishes(newData);
+      }
+      // const {data} = await axios.get(
+      //   `http://10.0.2.2:8080/api/dishes/${value}`,
+      // );
+      // if (data.success) {
+      //   console.log(data.dishes);
+      //   setDishes(data.dishes);
+      // }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const searchByNameDish = async text => {
+    setLoading(true);
+    try {
+      console.log('Text search', text);
+      // const {data} = await axios.get(
+      //   `http://10.0.2.2:8080/api/menu/search/dish/${text}`,
+      // );
+      // console.log('Log Data', data);
+      const newData = originalDishes.filter(dish => {
+        const itemData = dish.nameDish
+          ? dish.nameDish.toUpperCase()
+          : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setDishes(newData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (textSearch.length > 0) {
+      searchByNameDish(textSearch);
+    } else {
+      setDishes(originalDishes);
+    }
+  }, [textSearch]);
 
   return (
     <View style={styles.container}>
@@ -101,7 +168,7 @@ const ManageMenuDishScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <SearchComponent />
+      <SearchComponent textSearch={textSearch} setTextSearch={setTextSearch} />
       <View>
         <FlatList
           data={dataTypeDish}
@@ -123,24 +190,32 @@ const ManageMenuDishScreen = ({navigation}) => {
           }}
         />
       </View>
-      <ScrollView
-        nestedScrollEnabled={true}
-        contentContainerStyle={{flexGrow: 1}}>
-        <View className="flex-1 flex flex-row flex-wrap">
-          {items.map((item, index) => {
-            console.log(item);
-            return (
-              <DishItemAdmin
-                item={item}
-                index={index}
-                handleEdit={handleEdit}
-                handleDelete={handleDelete}
-                key={item._id}
-              />
-            );
-          })}
-        </View>
-      </ScrollView>
+      {loading ? (
+        <Spinner width={'100%'} height={'40%'} />
+      ) : (
+        <ScrollView
+          nestedScrollEnabled={true}
+          contentContainerStyle={{flexGrow: 1}}>
+          <View className="flex-1 flex flex-row flex-wrap">
+            {dishes &&
+              dishes.length > 0 &&
+              dishes.map((item, index) => {
+                if (item) {
+                  return (
+                    <DishItemAdmin
+                      item={item}
+                      index={index}
+                      handleEdit={handleEdit}
+                      handleDelete={handleDelete}
+                      key={item._id}
+                    />
+                  );
+                }
+                return null;
+              })}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };

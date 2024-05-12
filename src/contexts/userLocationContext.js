@@ -8,6 +8,7 @@ export const UserLocationContext = createContext();
 
 export const UserLocationProvider = ({children}) => {
   const [userLocation, setUserLocation] = useState(null);
+
   const requestLocationPermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(

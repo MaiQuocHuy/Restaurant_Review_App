@@ -6,6 +6,7 @@ import {
   PermissionsAndroid,
   StatusBar,
   Image,
+  Keyboard,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
@@ -15,40 +16,30 @@ import Mapbox from '@rnmapbox/maps';
 import {getCoordinatesFromAddress} from '../../helpers';
 import RestaurantListSearch from '../../components/RestaurantListSearch';
 import {Separator} from '../../components';
-import {useIsFocused} from '@react-navigation/native';
 import axios from 'axios';
-import {latitude, longitude} from '../../utils/data';
 import {useContext} from 'react';
 import {UserLocationContext} from '../../contexts/userLocationContext';
+import {debounce} from 'lodash';
+import {useCallback} from 'react';
+import LinearGradient from 'react-native-linear-gradient';
 
 const AccessToken =
   'pk.eyJ1IjoibWFpaHV5bWFwMTIzIiwiYSI6ImNsdmR0ZTloazAybDcyaXBweGp0ZmQ0eDYifQ.Umosc-ZzdKZOI6CKCCs8rA';
 
 Mapbox.setAccessToken(AccessToken);
 
-// MapBoxGL.setConnected(true);
-// MapBoxGL.setTelemetryEnabled(false);
-// MapBoxGL.setWellKnownTileServer('Mapbox');
-
-export default function SearchScreen() {
+export default function SearchScreen({navigation}) {
   // const [userLocation, setUserLocation] = useState(null);
   const [visible, setVisible] = useState(false);
   const [nearByPlace, setNearByPlace] = useState(false);
   const [mapRegion, setMapRegion] = useState([]);
-  const isFocused = useIsFocused();
+  const [originalRestaurants, setOriginalRestaurants] = useState([]);
+  //Restaurant in search
   const [restaurants, setRestaurants] = useState([]);
   const {userLocation, setUserLocation} = useContext(UserLocationContext);
   const [routeDirections, setRouteDirections] = useState();
-
-  useEffect(() => {
-    if (userLocation) {
-      console.log('User-Location', userLocation);
-      // createRouterLine(
-      //   [userLocation.longitude, userLocation.latitude],
-      //   [15.981419, 108.236561],
-      // );
-    }
-  }, [userLocation]);
+  const [textSearch, setTextSearch] = useState('');
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     if (userLocation != null) {
@@ -63,11 +54,48 @@ export default function SearchScreen() {
   }, [userLocation]);
 
   useEffect(() => {
-    console.log('Has been call api');
-    // if () {
-    console.log('Fetch dishes', isFocused);
     fetchRestaurants();
-    // }
+  }, []);
+
+  const searchByNameRestaurant = async text => {
+    console.log('Text search', text);
+    try {
+      const newData = originalRestaurants.filter(item => {
+        console.log(item);
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setRestaurants(newData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (textSearch.length > 0) searchByNameRestaurant(textSearch);
+    else setRestaurants(originalRestaurants);
+  }, [textSearch]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, []);
 
   const createMultipleRouteline = async () => {
@@ -98,6 +126,7 @@ export default function SearchScreen() {
     console.log('Restaurants', data.restaurants);
     if (data.success) {
       setRestaurants(data.restaurants);
+      setOriginalRestaurants(data.restaurants);
     }
   };
 
@@ -146,7 +175,11 @@ export default function SearchScreen() {
 
   return (
     <View className="justify-center items-center flex-1">
-      <StatusBar barStyle="dark-content" backgroundColor={'#fff'} translucent />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={'#C2C2CB'}
+        translucent
+      />
       <Separator height={StatusBar.currentHeight} />
       <View className="absolute z-20 top-10">
         <SearchBar
@@ -154,6 +187,8 @@ export default function SearchScreen() {
           nearByPlace={nearByPlace}
           setNearByPlace={setNearByPlace}
           setVisible={setVisible}
+          setTextSearch={setTextSearch}
+          textSearch={textSearch}
         />
       </View>
 
@@ -212,7 +247,6 @@ export default function SearchScreen() {
                   item?.coordinates?.latitude &&
                   item?.coordinates?.longitude
                 ) {
-                  console.log('Item', item.coordinates);
                   return (
                     <Mapbox.PointAnnotation
                       key={item._id}
@@ -245,12 +279,18 @@ export default function SearchScreen() {
             )}
           </Mapbox.MapView>
         )}
-        <View className="absolute z-20 bottom-28">
+        <View
+          className={`absolute z-20 ${
+            keyboardVisible ? 'bottom-52' : 'bottom-28'
+          }`}>
           <RestaurantListSearch
             restaurants={restaurants}
             nearByPlace={nearByPlace}
             userLocation={userLocation}
             setRestaurants={setRestaurants}
+            navigate={restaurantId => {
+              navigation.navigate('Restaurant', {restaurantId});
+            }}
           />
         </View>
       </View>

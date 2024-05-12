@@ -14,13 +14,24 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DocumentPicker from 'react-native-document-picker';
 import Dialog from 'react-native-dialog';
 import axios from 'axios';
+import Spinner from '../../components/Spinner';
+import {useContext} from 'react';
+import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
+import {useEffect} from 'react';
 
-const CreatePostScreen = ({navigation}) => {
+const CreatePostScreen = ({navigation, route}) => {
+  const idPost = route.params ? route.params.idPost : null;
+  const [textButton, setTextButton] = useState('Create');
+
+  const {posts, setPosts, postsPersonal, setPostsPersonal} = useContext(
+    dataUserGlobalContext,
+  );
+
   const [comment, setComment] = useState('');
   const [title, setTitle] = useState('');
   const [photo, setPhoto] = useState(null);
   const [visible, setVisible] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const showDialog = () => {
     setVisible(true);
   };
@@ -35,35 +46,71 @@ const CreatePostScreen = ({navigation}) => {
   };
 
   const handleSubmit = async () => {
-    console.log('Davao');
-    console.log(photo);
+    setLoading(true);
+
+    if (!photo || !title || !comment) return alert('Please fill all fields');
     try {
-      const formdata = new FormData();
-      formdata.append('title', title);
-      formdata.append('content', comment);
-      formdata.append('image', {
-        uri: photo.uri,
-        name: photo.name,
-        type: photo.type,
-      });
-      const {data} = await axios.post(
-        'http://10.0.2.2:8080/api/post/create',
-        formdata,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+      if (textButton === 'Create') {
+        const formdata = new FormData();
+        formdata.append('title', title);
+        formdata.append('content', comment);
+        formdata.append('image', {
+          uri: photo.uri,
+          name: photo.name,
+          type: photo.type,
+        });
+        const {data} = await axios.post(
+          'http://10.0.2.2:8080/api/post/create',
+          formdata,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        },
-      );
-      console.log('data', data);
-      if (data.success) {
-        setPhoto(null);
-        setTitle('');
-        setComment('');
-        navigation.goBack();
+        );
+        console.log('data', data);
+        if (data) {
+          setPhoto(null);
+          setTitle('');
+          setComment('');
+          setPosts(prevPost => [data, ...prevPost]);
+          navigation.goBack();
+        }
+      } else {
+        const formdata = new FormData();
+        formdata.append('title', title);
+        formdata.append('content', comment);
+        formdata.append('image', {
+          uri: photo.uri,
+          type: 'image/*',
+          name: Math.random().toString(36).substring(2, 8),
+        });
+        const {data} = await axios.put(
+          `http://10.0.2.2:8080/api/update/post/${idPost}`,
+          formdata,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+        if (data) {
+          setPhoto(null);
+          setTitle('');
+          setComment('');
+          setPostsPersonal(prevPost =>
+            prevPost.map(post => (post._id === idPost ? data : post)),
+          );
+          setPosts(prevPost =>
+            prevPost.map(post => (post._id === idPost ? data : post)),
+          );
+          navigation.navigate('ProfileStack', {screen: 'PostPersonal'});
+        }
       }
     } catch (error) {
       console.log('Error', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,6 +132,21 @@ const CreatePostScreen = ({navigation}) => {
       }
     }
   };
+
+  useEffect(() => {
+    console.log('idPost', idPost, posts);
+    if (idPost && posts && posts.length > 0) {
+      setTextButton('Edit');
+      console.log('idPost', idPost);
+      console.log('posts', posts);
+      const post = posts?.find(post => post._id === idPost);
+      console.log('post', post);
+      setTitle(post.title);
+      setComment(post.content);
+      setPhoto({uri: post.image.url});
+    }
+  }, []);
+
   return (
     <View className="flex-1 bg-DEFAULT_WHITE">
       <StatusBar barStyle="light-content" backgroundColor="#fff" translucent />
@@ -100,16 +162,20 @@ const CreatePostScreen = ({navigation}) => {
         <Text className="text-xl pl-5 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Post
         </Text>
-        <TouchableOpacity onPress={handleSubmit}>
-          <Text
-            className={`text-lg ${
-              comment != '' && title != '' && photo
-                ? 'text-DEFAULT_GREEN'
-                : 'text-DEFAULT_GREY'
-            } font-POPPINS_MEDIUM`}>
-            Publish
-          </Text>
-        </TouchableOpacity>
+        {loading ? (
+          <Spinner width={40} height={40} />
+        ) : (
+          <TouchableOpacity onPress={handleSubmit}>
+            <Text
+              className={`text-lg ${
+                comment != '' && title != '' && photo
+                  ? 'text-DEFAULT_GREEN'
+                  : 'text-DEFAULT_GREY'
+              } font-POPPINS_MEDIUM`}>
+              {textButton}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* <ScrollView> */}
@@ -127,6 +193,7 @@ const CreatePostScreen = ({navigation}) => {
               className="text-xl  font-POPPINS_REGULAR text-DEFAULT_BLACK px-2 py-4"
               placeholderTextColor={'#C2C2CB'}
               onChangeText={text => setTitle(text)}
+              value={title}
             />
           </View>
           <View className="w-full h-auto">
@@ -136,6 +203,7 @@ const CreatePostScreen = ({navigation}) => {
               className="text-lg  font-POPPINS_REGULAR text-DEFAULT_BLACK px-2 py-4"
               placeholderTextColor={'#C2C2CB'}
               onChangeText={text => setComment(text)}
+              value={comment}
             />
           </View>
           {photo && (
@@ -143,7 +211,7 @@ const CreatePostScreen = ({navigation}) => {
               <View className="w-full items-center justify-center">
                 <Image
                   source={{
-                    uri: photo.uri,
+                    uri: photo?.uri,
                   }}
                   className="w-[96%] h-[40vh] rounded-lg "
                 />

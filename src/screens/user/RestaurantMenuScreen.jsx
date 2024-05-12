@@ -7,7 +7,7 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import {Separator} from '../../components';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useState} from 'react';
@@ -16,6 +16,10 @@ import CategoryListItem from '../../components/CategoryListItem';
 import {dataTypeDish} from '../../utils/data';
 import axios from 'axios';
 import {useEffect} from 'react';
+import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
+import Spinner from '../../components/Spinner';
+import {useCallback} from 'react';
+import {debounce, set} from 'lodash';
 
 const RestaurantMenuScreen = ({
   navigation,
@@ -23,32 +27,84 @@ const RestaurantMenuScreen = ({
     params: {restaurantId},
   },
 }) => {
-  console.log('RestaurantMenuScreen', restaurantId);
   const [textSearch, setTextSearch] = useState('');
-  const [items, setItems] = useState([]);
+  const {dishes, setDishes} = useContext(dataUserGlobalContext);
+  const [loading, setLoading] = useState(false);
   const [activeItem, setActiveItem] = useState('all');
+  const [originalDishes, setOriginalDishes] = useState([]);
   const fetchDishes = async () => {
-    const {data} = await axios.get(
-      `http://10.0.2.2:8080/api/menu/restaurant/${restaurantId}/dishes/${activeItem}`,
-    );
-    if (data.success) {
-      console.log('Dishes', data.dishes);
-      setItems(data.dishes);
+    setLoading(true);
+    try {
+      const {data} = await axios.get(
+        `http://10.0.2.2:8080/api/menu/restaurant/${restaurantId}/dishes/${activeItem}`,
+      );
+      if (data.success) {
+        console.log('data', data);
+        setDishes(data.dishes);
+        setOriginalDishes(data.dishes);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
     fetchDishes();
   }, []);
 
+  const searchByNameDish = async text => {
+    setLoading(true);
+    try {
+      const newData = originalDishes.filter(dish => {
+        const itemData = dish.nameDish
+          ? dish.nameDish.toUpperCase()
+          : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setDishes(newData);
+      // console.log('Text search', text);
+      // const {data} = await axios.get(
+      //   `http://10.0.2.2:8080/api/menu/search/dish/${text}`,
+      // );
+      // console.log('Log Data', data);
+      // setDishes(data.dishes[0].items);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (textSearch.length > 0) {
+      searchByNameDish(textSearch);
+    } else {
+      setDishes(originalDishes);
+    }
+  }, [textSearch]);
+
   const handleChooseType = async value => {
     console.log('Choose', value);
-    const {data} = await axios.get(
-      `http://10.0.2.2:8080/api/menu/restaurant/${restaurantId}/dishes/${value}`,
-    );
-    if (data.success) {
-      console.log('ChooseType', data.dishes);
-      setItems(data.dishes);
+    setLoading(true);
+    try {
+      const {data} = await axios.get(
+        `http://10.0.2.2:8080/api/menu/restaurant/${restaurantId}/dishes/${value}`,
+      );
+      if (data.success) {
+        console.log('ChooseType', data.dishes);
+        setDishes(data.dishes);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const resetInput = () => {
+    setTextSearch('');
   };
   return (
     <View classname="flex-1 bg-SECONDARY_WHITE">
@@ -62,6 +118,7 @@ const RestaurantMenuScreen = ({
         <TouchableOpacity
           onPress={() => {
             console.log('Back');
+            resetInput();
             navigation.goBack();
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
@@ -81,9 +138,6 @@ const RestaurantMenuScreen = ({
             selectionColor="#0E122B"
             value={textSearch}
             onChangeText={text => setTextSearch(text)}
-            onEndEditing={() => {
-              console.log(textSearch);
-            }}
           />
         </View>
       </View>
@@ -108,25 +162,29 @@ const RestaurantMenuScreen = ({
           }}
         />
       </View>
-      <ScrollView>
-        {/* <View className="flex-row flex-wrap"> */}
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            flex: 1,
-            alignItems: 'flex-start',
-          }}>
-          {items.map((item, index) => {
-            console.log(index);
-            return <DishItem key={index} {...item} />;
-          })}
-        </View>
+      {loading ? (
+        <Spinner width={'100%'} height={'40%'} />
+      ) : (
+        <ScrollView>
+          {/* <View className="flex-row flex-wrap"> */}
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              flex: 1,
+              alignItems: 'flex-start',
+            }}>
+            {dishes &&
+              dishes.map((item, index) => {
+                return <DishItem key={index} {...item} />;
+              })}
+          </View>
 
-        {/* </View> */}
-        <Separator height={320} />
-        {/* </View> */}
-      </ScrollView>
+          {/* </View> */}
+          <Separator height={320} />
+          {/* </View> */}
+        </ScrollView>
+      )}
     </View>
   );
 };

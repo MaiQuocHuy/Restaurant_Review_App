@@ -1,4 +1,4 @@
-import {View, Text} from 'react-native';
+import {View, Text, Image} from 'react-native';
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -11,6 +11,9 @@ import {
 } from '../../screens';
 import MenuDishStackScreen from './MenuDishStackScreen';
 import OverviewRestaurant from '../../screens/ownres/OverviewRestaurant';
+import ManageRestaurantVoucher from '../../screens/ownres/ManageRestaurantVoucher';
+import {Images} from '../../constants';
+import VoucherStackScreen from './VoucherStackScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,11 +50,20 @@ const OwnresStackScreen = () => {
         }}
       />
       <Drawer.Screen
-        name="Mana MenuDish Restaurant"
+        name="Manage MenuDish Restaurant"
         component={MenuDishStackScreen}
         options={{
           drawerIcon: ({color}) => (
             <Ionicons name="menu-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Manage Voucher Restaurant"
+        component={VoucherStackScreen}
+        options={{
+          drawerIcon: ({color}) => (
+            <Ionicons name="card-outline" size={22} color={color} />
           ),
         }}
       />

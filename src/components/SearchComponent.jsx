@@ -1,14 +1,22 @@
 import {View, Text, TextInput, StyleSheet} from 'react-native';
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-const SearchComponent = () => {
+const SearchComponent = ({
+  textSearch,
+  setTextSearch,
+  voucherSearchStyle = null,
+}) => {
   return (
-    <View style={styles.container}>
+    <View style={voucherSearchStyle ? voucherSearchStyle : styles.container}>
       <Ionicons name="search-outline" size={20} color="#000" />
       <TextInput
         style={styles.input}
         placeholder="Search..."
         placeholderTextColor="#C2C2CB"
+        underlineColorAndroid={'transparent'}
+        selectionColor="#0E122B"
+        value={textSearch}
+        onChangeText={text => setTextSearch(text)}
       />
     </View>
   );
