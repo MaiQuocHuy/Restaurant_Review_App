@@ -8,6 +8,8 @@ import {
 } from './src/contexts/dataUserGlobalContext';
 import {UserProvider} from './src/contexts/userContext';
 import {DataOwnresGlobalProvider} from './src/contexts/dataOwnresGlobalContext';
+import {LogBox} from 'react-native';
+LogBox.ignoreAllLogs();
 export default function App() {
   return (
     <UserLocationProvider>

@@ -34,7 +34,6 @@ export default function SearchBar({
 
   return (
     <View>
-  
       <View classname="bg-DEFAULT_WHITE p-5">
         <View
           style={{
@@ -74,7 +73,7 @@ export default function SearchBar({
           <Ionicons name="search" size={24} color="#C2C2CB" />
           <TextInput
             placeholder="Search by name restaurant..."
-            style={{backgroundColor: '#fff', width: '80%'}}
+            style={{backgroundColor: '#fff', width: '80%', color: '#000'}}
             value={textSearch}
             onChangeText={text => setTextSearch(text)}
           />

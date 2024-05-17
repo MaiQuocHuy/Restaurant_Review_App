@@ -5,6 +5,7 @@ import {useState} from 'react';
 import {useEffect} from 'react';
 import * as turf from '@turf/turf';
 import axios from 'axios';
+import {BASE_URL} from '../helpers';
 
 const RestaurantListSearch = ({
   setRestaurants,
@@ -42,7 +43,7 @@ const RestaurantListSearch = ({
   }, [nearByPlace, userLocation]);
 
   const fetchRestaurants = async () => {
-    const {data} = await axios.get('http://10.0.2.2:8080/api/restaurant/show');
+    const {data} = await axios.get(`${BASE_URL}/restaurant/show`);
     console.log('Restaurants', data.restaurants);
     if (data.success) {
       setRestaurants(data.restaurants);
@@ -53,7 +54,7 @@ const RestaurantListSearch = ({
     const centerPoint = turf.point(center);
     const point = turf.point(coordinate);
     return turf.distance(centerPoint, point);
-  };
+  };  
 
   // const center = [long1, lat1]; // replace with your center longitude and latitude
   // const coordinates = [[long2, lat2], [long3, lat3], [long4, lat4]]; // replace with your coordinates

@@ -17,6 +17,7 @@ import SearchComponent from '../../components/SearchComponent';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Spinner from '../../components/Spinner';
 import VoucherItem from '../../components/VoucherItem';
+import {BASE_URL} from '../../helpers';
 
 const voucherSearchStyle = {
   marginHorizontal: 8,
@@ -41,9 +42,7 @@ const VoucherScreen = ({navigation}) => {
   const fetchVouchers = useCallback(async () => {
     setLoadingVouchers(true);
     try {
-      const {data} = await axios.get(
-        'http://10.0.2.2:8080/api/me/vouncher/show',
-      );
+      const {data} = await axios.get(`${BASE_URL}/me/vouncher/show`);
       console.log('data', data);
       if (data.success) {
         setVouchers(data.vouchers);
@@ -97,7 +96,7 @@ const VoucherScreen = ({navigation}) => {
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#000000" />
         </TouchableOpacity>
-        <Text className="text-lg w-full ml-28 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-lg w-full ml-32 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Vouchers
         </Text>
       </View>

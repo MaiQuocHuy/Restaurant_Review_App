@@ -25,7 +25,7 @@ const DishItem = props => {
             {props?.nameDish}
           </Text>
           {/* Tags */}
-          <Text className="text-sm text-DEFAULT_GRAY font-POPPINS_REGULAR">
+          <Text className="text-sm text-DEFAULT_GREY text-DEFAULT_GRAY font-POPPINS_REGULAR">
             {props?.typeDish}
           </Text>
           {/* Price */}

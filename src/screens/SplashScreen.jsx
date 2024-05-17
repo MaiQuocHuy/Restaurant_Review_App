@@ -5,17 +5,15 @@ import {Display} from '../utils';
 import {getDataWithExpiration} from '../helpers/asyncStorage';
 import axios from 'axios';
 import {UserContext} from '../contexts/userContext';
+import {BASE_URL} from '../helpers';
 
 const SplashScreen = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
   const checkRoleWithToken = async idToken => {
     try {
-      const {data} = await axios.post(
-        'http://10.0.2.2:8080/api/login-with-token',
-        {
-          id: idToken,
-        },
-      );
+      const {data} = await axios.post(`${BASE_URL}/login-with-token`, {
+        id: idToken,
+      });
 
       console.log('Data', data.user);
       setUser(data.user);
@@ -58,7 +56,7 @@ const SplashScreen = ({navigation}) => {
         translucent
       />
       <Image source={Images.PLATE} resizeMethod="resize" style={styles.image} />
-      <Text className="text-DEFAULT_WHITE text-3xl font-POPPINS_LIGHT">
+      <Text className="text-DEFAULT_WHITE text-3xl font-POPPINS_LIGHT text-center">
         Review Restaurant App
       </Text>
     </View>

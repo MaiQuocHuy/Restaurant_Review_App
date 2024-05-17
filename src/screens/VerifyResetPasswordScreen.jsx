@@ -10,6 +10,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {Separator} from '../components';
+import {BASE_URL} from '../helpers';
 
 const VerifyResetPasswordScreen = ({navigation, route}) => {
   const email = route.params ? route.params.email : null;
@@ -25,13 +26,17 @@ const VerifyResetPasswordScreen = ({navigation, route}) => {
     try {
       const fullOtp = Object.values(otp).join('');
       console.log(fullOtp);
-      const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/verifyPassword`,
-        {
-          key: fullOtp,
-          email,
-        },
-      );
+      // const {data} = await axios.put(
+      //   `http://10.0.2.2:8080/api/verifyPassword`,
+      //   {
+      //     key: fullOtp,
+      //     email,
+      //   },
+      // );
+      const {data} = await axios.put(`${BASE_URL}/verifyPassword`, {
+        key: fullOtp,
+        email,
+      });
       console.log(data);
       if (data.success) {
         navigation.navigate('UpdatePassword', {

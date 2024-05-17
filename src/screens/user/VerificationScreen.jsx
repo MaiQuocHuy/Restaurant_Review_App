@@ -11,6 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Separator} from '../../components';
 import axios from 'axios';
 import {UserContext} from '../../contexts/userContext';
+import {BASE_URL} from '../../helpers';
 
 const VerificationScreen = ({navigation}) => {
   const {user, setUser} = useContext(UserContext);
@@ -26,7 +27,7 @@ const VerificationScreen = ({navigation}) => {
     try {
       const fullOtp = Object.values(otp).join('');
       console.log(fullOtp);
-      const {data} = await axios.put(`http://10.0.2.2:8080/api/verify`, {
+      const {data} = await axios.put(`${BASE_URL}/verify`, {
         key: fullOtp,
       });
       console.log(data);

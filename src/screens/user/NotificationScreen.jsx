@@ -12,6 +12,7 @@ import Spinner from '../../components/Spinner';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {useEffect} from 'react';
+import {BASE_URL} from '../../helpers';
 const NotificationScreen = ({navigation}) => {
   const [loadingNotification, setLoadingNotification] = useState(false);
   const [notification, setNotification] = useState([]);
@@ -19,9 +20,7 @@ const NotificationScreen = ({navigation}) => {
   const fetchNotifications = async () => {
     setLoadingNotification(true);
     try {
-      const {data} = await axios.get(
-        'http://10.0.2.2:8080/api/notifications/show',
-      );
+      const {data} = await axios.get(`${BASE_URL}/notifications/show`);
       if (data.success) {
         console.log('Data', data);
         setNotification(data.notifications);
@@ -47,7 +46,7 @@ const NotificationScreen = ({navigation}) => {
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
         </TouchableOpacity>
-        <Text className="text-xl w-full ml-28 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-xl w-full ml-36 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Notifcation
         </Text>
       </View>

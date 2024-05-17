@@ -17,7 +17,7 @@ import moment from 'moment';
 import {useEffect} from 'react';
 import axios from 'axios';
 import PostItem from '../../components/PostItem';
-
+import {BASE_URL} from '../../helpers';
 
 const PostPersonalScreen = ({navigation}) => {
   const [loadingPost, setLoadingPost] = useState(false);
@@ -34,7 +34,7 @@ const PostPersonalScreen = ({navigation}) => {
         const userPosts = posts.filter(post => post.postedBy._id === user._id);
         setPostsPersonal(userPosts);
       } else {
-        const {data} = await axios.get('http://10.0.2.2:8080/api/posts/show');
+        const {data} = await axios.get(`${BASE_URL}/posts/show`);
         if (data.success) {
           const userPosts = data.posts.filter(
             post => post.postedBy._id === user._id,
@@ -60,9 +60,7 @@ const PostPersonalScreen = ({navigation}) => {
 
   const handleDelete = async id => {
     try {
-      const {data} = await axios.delete(
-        `http://10.0.2.2:8080/api/delete/post/${id}`,
-      );
+      const {data} = await axios.delete(`${BASE_URL}/delete/post/${id}`);
       if (data.success) {
         const newPost = posts.filter(post => post._id !== id);
         const newPostPersonal = postsPersonal.filter(post => post._id !== id);
@@ -77,29 +75,30 @@ const PostPersonalScreen = ({navigation}) => {
 
   const handleToggleLike = async idPost => {
     try {
-      const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/like/post/${idPost}`,
-      );
+      const {data} = await axios.put(`${BASE_URL}/like/post/${idPost}`);
 
       if (data.success) {
-        const updatePosts = postsArray =>
+        const updatePosts = postsArray => {
           postsArray.map(post => {
-            if (data.check) {
-              // If data.check is true, add _id to likes array
-              return {
-                ...post,
-                likes: [...post.likes, user._id],
-                countLike: (Number(post.countLike) || 0) + 1,
-              };
-            } else {
-              // If data.check is false, remove _id from likes array
-              return {
-                ...post,
-                likes: post.likes.filter(id => id !== user._id),
-                countLike: (Number(post.countLike) || 0) - 1,
-              };
-            }
+            if (String(post._id) === String(idPost)) {
+              if (data.check) {
+                // If data.check is true, add _id to likes array
+                return {
+                  ...post,
+                  likes: [...post.likes, user._id],
+                  countLike: (Number(post.countLike) || 0) + 1,
+                };
+              } else {
+                // If data.check is false, remove _id from likes array
+                return {
+                  ...post,
+                  likes: post.likes.filter(id => id !== user._id),
+                  countLike: (Number(post.countLike) || 0) - 1,
+                };
+              }
+            } else return post;
           });
+        };
 
         setPostsPersonal(updatePosts(postsPersonal));
         setPosts(updatePosts(posts));
@@ -110,8 +109,8 @@ const PostPersonalScreen = ({navigation}) => {
   };
 
   useEffect(() => {
-    if (user && user.role === 'user') fetchPosts();
-  }, [user]);
+    fetchPosts();
+  }, []);
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -125,7 +124,7 @@ const PostPersonalScreen = ({navigation}) => {
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
         </TouchableOpacity>
-        <Text className="text-xl w-full ml-24 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-xl w-full ml-32 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Post Personal
         </Text>
       </View>

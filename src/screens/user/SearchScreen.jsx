@@ -13,7 +13,7 @@ import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import SearchBar from '../../components/SearchBar';
 import Mapbox from '@rnmapbox/maps';
-import {getCoordinatesFromAddress} from '../../helpers';
+import {BASE_URL, getCoordinatesFromAddress} from '../../helpers';
 import RestaurantListSearch from '../../components/RestaurantListSearch';
 import {Separator} from '../../components';
 import axios from 'axios';
@@ -122,7 +122,7 @@ export default function SearchScreen({navigation}) {
   }, [restaurants, userLocation]);
 
   const fetchRestaurants = async () => {
-    const {data} = await axios.get('http://10.0.2.2:8080/api/restaurant/show');
+    const {data} = await axios.get(`${BASE_URL}/restaurant/show`);
     console.log('Restaurants', data.restaurants);
     if (data.success) {
       setRestaurants(data.restaurants);
@@ -224,6 +224,11 @@ export default function SearchScreen({navigation}) {
                   />
                 </Mapbox.ShapeSource>
               ))}
+            {console.log(
+              'Location',
+              userLocation?.longitude,
+              userLocation?.latitude,
+            )}
             <Mapbox.PointAnnotation
               coordinate={[userLocation?.longitude, userLocation?.latitude]}
               id="1">

@@ -13,6 +13,7 @@ import {
 } from '../helpers/asyncStorage';
 import Spinner from '../components/Spinner';
 import {UserContext} from '../contexts/userContext';
+import {BASE_URL} from '../helpers';
 
 export default function SignInScreen({navigation}) {
   const [save, setSave] = useState(false);
@@ -31,10 +32,14 @@ export default function SignInScreen({navigation}) {
   const login = async () => {
     setLoading(true);
     try {
-      const {data} = await axios.post('http://10.0.2.2:8080/api/signin', {
+      const {data} = await axios.post(`${BASE_URL}/signin`, {
         email,
         password,
       });
+      // const {data} = await axios.post('http://10.0.2.2:8080/api/signin', {
+      //   email,
+      //   password,
+      // });
       console.log(data);
       if (data.success) {
         resetInput();

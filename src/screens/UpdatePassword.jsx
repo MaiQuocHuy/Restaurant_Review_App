@@ -13,6 +13,7 @@ import {
 } from '../helpers/asyncStorage';
 import Spinner from '../components/Spinner';
 import {UserContext} from '../contexts/userContext';
+import {BASE_URL} from '../helpers';
 
 export default function UpdatePassword({navigation, route}) {
   const email = route.params ? route.params.email : null;
@@ -39,14 +40,11 @@ export default function UpdatePassword({navigation, route}) {
       return;
     }
     try {
-      const {data} = await axios.put(
-        'http://10.0.2.2:8080/api/updatePassword',
-        {
-          email,
-          newPassword: password,
-          reNewPassword: confirmedPassword,
-        },
-      );
+      const {data} = await axios.put(`${BASE_URL}/updatePassword`, {
+        email,
+        newPassword: password,
+        reNewPassword: confirmedPassword,
+      });
       if (data.success) {
         resetInput();
         navigation.navigate('Signin');
@@ -77,7 +75,7 @@ export default function UpdatePassword({navigation, route}) {
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
         </TouchableOpacity>
-        <Text className="text-lg w-full ml-20 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-lg w-full ml-32 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Update Password
         </Text>
       </View>

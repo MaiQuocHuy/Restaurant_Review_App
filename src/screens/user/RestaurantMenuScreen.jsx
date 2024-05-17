@@ -20,6 +20,7 @@ import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
 import Spinner from '../../components/Spinner';
 import {useCallback} from 'react';
 import {debounce, set} from 'lodash';
+import {BASE_URL} from '../../helpers';
 
 const RestaurantMenuScreen = ({
   navigation,
@@ -36,7 +37,7 @@ const RestaurantMenuScreen = ({
     setLoading(true);
     try {
       const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/menu/restaurant/${restaurantId}/dishes/${activeItem}`,
+        `${BASE_URL}/menu/restaurant/${restaurantId}/dishes/${activeItem}`,
       );
       if (data.success) {
         console.log('data', data);
@@ -90,7 +91,7 @@ const RestaurantMenuScreen = ({
     setLoading(true);
     try {
       const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/menu/restaurant/${restaurantId}/dishes/${value}`,
+        `${BASE_URL}/menu/restaurant/${restaurantId}/dishes/${value}`,
       );
       if (data.success) {
         console.log('ChooseType', data.dishes);
@@ -123,7 +124,7 @@ const RestaurantMenuScreen = ({
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
         </TouchableOpacity>
-        <Text className="text-lg w-full ml-32 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-lg w-full ml-40 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Menu
         </Text>
       </View>

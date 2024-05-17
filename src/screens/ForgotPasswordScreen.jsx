@@ -13,6 +13,7 @@ import {
 import {useState} from 'react';
 import Spinner from '../components/Spinner';
 import axios from 'axios';
+import {BASE_URL} from '../helpers';
 
 export default function ForgotPasswordScreen({navigation}) {
   const [email, setEmail] = useState('');
@@ -30,12 +31,16 @@ export default function ForgotPasswordScreen({navigation}) {
         return;
       }
 
-      const {data} = await axios.put(
-        'http://10.0.2.2:8080/api/sendForgotPassword',
-        {
-          email,
-        },
-      );
+      const {data} = await axios.put(`${BASE_URL}/sendForgotPassword`, {
+        email,
+      });
+
+      // const {data} = await axios.put(
+      //   'http://10.0.2.2:8080/api/sendForgotPassword',
+      //   {
+      //     email,
+      //   },
+      // );
       alert(data.message);
       if (data.success) {
         navigation.navigate('VerifyResetPassword', {
@@ -82,8 +87,8 @@ export default function ForgotPasswordScreen({navigation}) {
           <TextInput
             placeholder="Email"
             placeholderTextColor="#C2C2CB"
-            selectionColor="#C2C2CB"
-            className="w-full text-base focus:outline-none"
+            selectionColor="#0E122B"
+            className="w-full text-base text-DEFAULT_BLACK focus:outline-none"
             value={email}
             onChangeText={text => setEmail(text)}
           />

@@ -24,6 +24,7 @@ import {UserLocationContext} from '../../contexts/userLocationContext';
 import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
 import {UserContext} from '../../contexts/userContext';
 import {LogBox} from 'react-native';
+import {BASE_URL} from '../../helpers';
 
 LogBox.ignoreLogs(['ReactImageView: Image source']);
 export default function HomeScreen({navigation}) {
@@ -40,9 +41,7 @@ export default function HomeScreen({navigation}) {
   const fetchRestaurants = async () => {
     setLoadingRestaurants(true);
     try {
-      const {data} = await axios.get(
-        'http://10.0.2.2:8080/api/restaurant/show',
-      );
+      const {data} = await axios.get(`${BASE_URL}/restaurant/show`);
       console.log('Data', data.restaurants);
       if (data.success) {
         setRestaurants(data.restaurants);
@@ -68,34 +67,37 @@ export default function HomeScreen({navigation}) {
     }
   };
 
+  const updateRestaurantBookMarked = (restaurantsBookMark, id, check) => {
+    return restaurantsBookMark.map(restaurant => {
+      console.log('Restaurant', restaurant._id, id);
+      if (String(restaurant._id.trim()) == String(id.trim())) {
+        if (check) {
+          console.log('User', user._id);
+          return {
+            ...restaurant,
+            bookmarks: [...restaurant.bookmarks, user._id],
+          };
+        } else {
+          return {
+            ...restaurant,
+            bookmarks: restaurant.bookmarks.filter(
+              bookmark => bookmark !== user._id,
+            ),
+          };
+        }
+      } else return restaurant;
+    });
+  };
+
   const handleBookMark = async id => {
     try {
       const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/restaurant/bookmark/${id}`,
+        `${BASE_URL}/restaurant/bookmark/${id.trim()}`,
       );
       console.log('Bookmark', data);
       if (data.success) {
-        console.log(restaurants);
-        const updateRestaurantBookMarked = restaurantsBookMark => {
-          return restaurantsBookMark.map(restaurant => {
-            if (restaurant._id == id) {
-              if (data.check) {
-                return {
-                  ...restaurant,
-                  bookmarks: [...restaurant.bookmarks, user._id],
-                };
-              } else {
-                return {
-                  ...restaurant,
-                  bookmarks: restaurant.bookmarks.filter(
-                    bookmark => bookmark !== user._id,
-                  ),
-                };
-              }
-            } else return restaurant;
-          });
-        };
-        setRestaurants(updateRestaurantBookMarked(restaurants));
+        console.log('Dâta', data);
+        setRestaurants(updateRestaurantBookMarked(restaurants, id, data.check));
       }
     } catch (error) {
       console.log(error);
@@ -112,7 +114,7 @@ export default function HomeScreen({navigation}) {
         restaurants.filter(res => res.type === activeSortItem),
       );
     }
-    console.log('Render', restaurants);
+    // console.log('Render', restaurants);
   }, [restaurants]);
 
   useEffect(() => {
@@ -218,7 +220,7 @@ export default function HomeScreen({navigation}) {
                 // handleActiveSortItem('asian');
                 setActiveSortItem('asianrestaurant');
               }}>
-              <Text className="text-DEFAULT_BLACK text-sm font-POPPINS_SEMI_BOLD">
+              <Text className="text-DEFAULT_BLACK text-base font-POPPINS_SEMI_BOLD">
                 Asian
               </Text>
             </TouchableOpacity>
@@ -233,7 +235,7 @@ export default function HomeScreen({navigation}) {
                 // handleActiveSortItem('european');
                 setActiveSortItem('europeanrestaurant');
               }}>
-              <Text className="text-DEFAULT_BLACK text-sm font-POPPINS_SEMI_BOLD">
+              <Text className="text-DEFAULT_BLACK text-base font-POPPINS_SEMI_BOLD">
                 European
               </Text>
             </TouchableOpacity>
@@ -248,7 +250,7 @@ export default function HomeScreen({navigation}) {
                 // handleActiveSortItem('american');
                 setActiveSortItem('americanrestaurant');
               }}>
-              <Text className="text-DEFAULT_BLACK text-sm font-POPPINS_SEMI_BOLD">
+              <Text className="text-DEFAULT_BLACK text-base font-POPPINS_SEMI_BOLD">
                 American
               </Text>
             </TouchableOpacity>
@@ -263,7 +265,7 @@ export default function HomeScreen({navigation}) {
                 // handleActiveSortItem('african');
                 setActiveSortItem('africanrestaurant');
               }}>
-              <Text className="text-DEFAULT_BLACK text-sm font-POPPINS_SEMI_BOLD">
+              <Text className="text-DEFAULT_BLACK text-base font-POPPINS_SEMI_BOLD">
                 African
               </Text>
             </TouchableOpacity>
