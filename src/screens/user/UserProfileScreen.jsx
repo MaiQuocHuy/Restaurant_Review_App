@@ -17,7 +17,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import {removeTokenInStorage} from '../../helpers';
+import {BASE_URL, removeTokenInStorage} from '../../helpers';
 import {useEffect} from 'react';
 import {useState} from 'react';
 import {Images} from '../../constants';
@@ -31,7 +31,7 @@ export default function UserProfile({navigation}) {
   const handleSignOut = async () => {
     // sign out logic here
     try {
-      const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
+      const {data} = await axios.get(`${BASE_URL}/logout`);
       console.log(data);
       if (data.success) {
         await removeTokenInStorage('token');
@@ -45,9 +45,7 @@ export default function UserProfile({navigation}) {
   const handleVerify = async () => {
     try {
       if (user.verified) return alert('Your account already verified');
-      const {data} = await axios.put(
-        'http://10.0.2.2:8080/api/sendVerification',
-      );
+      const {data} = await axios.put(`${BASE_URL}/sendVerification`);
       console.log(data);
       navigation.navigate('Verification');
     } catch (error) {
@@ -78,7 +76,7 @@ export default function UserProfile({navigation}) {
           }}
         />
         <View className="flex-1 gap-1">
-          <Text className="text-lg font-POPPINS_MEDIUM text- decoration-DEFAULT_BLACK">
+          <Text className="text-lg font-POPPINS_MEDIUM text-DEFAULT_BLACK">
             {user?.name}
           </Text>
           <Text className="text-base font-POPPINS_REGULAR text-DEFAULT_GREY">
@@ -88,7 +86,7 @@ export default function UserProfile({navigation}) {
       </View>
       <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
         <View className="bg-DEFAULT_GREEN justify-center items-center p-2 rounded-lg mb-6">
-          <Text className="text-DEFAULT_WHITE font-POPPINS_MEDIUM text-lg">
+          <Text className="text-DEFAULT_WHITE font-POPPINS_MEDIUM text-  ">
             Edit Profile
           </Text>
         </View>
@@ -108,7 +106,11 @@ export default function UserProfile({navigation}) {
         <TouchableOpacity onPress={() => navigation.navigate('PostPersonal')}>
           <View className="pl-3 py-2 pr-6 flex-row mb-6">
             <View className="flex-row w-full items-center">
-              <FontAwesome size={26} color="#0A8791" name="bookmark" />
+              <MaterialCommunityIcons
+                size={26}
+                color="#0A8791"
+                name="post-outline"
+              />
               <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM px-4">
                 PostPersonal
               </Text>

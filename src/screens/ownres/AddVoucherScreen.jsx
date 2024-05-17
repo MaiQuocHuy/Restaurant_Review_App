@@ -10,12 +10,14 @@ import React from 'react';
 import {Separator} from '../../components';
 import DatePicker from 'react-native-date-picker';
 import {useState} from 'react';
-import axios from 'axios';
+import   os from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Spinner from '../../components/Spinner';
 import {useContext} from 'react';
 import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
 import {useEffect} from 'react';
+import { BASE_URL } from '../../helpers';
+import axios from 'axios';
 
 const AddVoucherScreen = ({navigation, route}) => {
   const idVoucher = route.params ? route.params.idVoucher : null;
@@ -86,7 +88,7 @@ const AddVoucherScreen = ({navigation, route}) => {
     try {
       if (textButton === 'Create') {
         const {data} = await axios.post(
-          'http://10.0.2.2:8080/api/vouncher/create',
+          `${BASE_URL}/vouncher/create`,
           {
             content,
             discount,
@@ -102,7 +104,7 @@ const AddVoucherScreen = ({navigation, route}) => {
         }
       } else {
         const {data} = await axios.put(
-          `http://10.0.2.2:8080/api/vouncher/update/${idVoucher}`,
+          `${BASE_URL}/vouncher/update/${idVoucher}`,
           {
             content,
             discount,

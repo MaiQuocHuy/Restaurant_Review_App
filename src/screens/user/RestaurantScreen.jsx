@@ -23,9 +23,10 @@ import {useRef} from 'react';
 import axios from 'axios';
 import Spinner from '../../components/Spinner';
 import ProgressBar from 'react-native-progress/Bar';
-import {getCoordinatesFromAddress} from '../../helpers';
+import {BASE_URL, getCoordinatesFromAddress} from '../../helpers';
 import {UserLocationContext} from '../../contexts/userLocationContext';
 import * as turf from '@turf/turf';
+import {LogBox} from 'react-native';
 
 const AccessToken =
   'pk.eyJ1IjoibWFpaHV5bWFwMTIzIiwiYSI6ImNsdmR0ZTloazAybDcyaXBweGp0ZmQ0eDYifQ.Umosc-ZzdKZOI6CKCCs8rA';
@@ -93,10 +94,18 @@ const RestaurantScreen = ({
 
   const handleShare = () => {
     console.log('Share');
-    Share.share({
-      title: 'Share restaurant',
-      message: `Check out ${restaurant.name} at ${restaurant.address}`,
-    });
+    Share.share(
+      {
+        title: 'Share restaurant',
+        message: `Check out ${restaurant.name} at ${restaurant.address}`,
+      },
+      {dialogTitle: 'Android Title'},
+    )
+      .then(({action, activityType}) => {
+        if (action === Share.sharedAction) console.log('Share was successful');
+        else console.log('Share was dismissed');
+      })
+      .catch(err => console.log(err));
   };
 
   function formatDate(dateString) {
@@ -108,7 +117,7 @@ const RestaurantScreen = ({
     setLoading(true);
     try {
       const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/restaurant/show/${restaurantId}`,
+        `${BASE_URL}/restaurant/show/${restaurantId}`,
       );
       if (data.success) {
         setRestaurant(data.restaurant);
@@ -137,12 +146,9 @@ const RestaurantScreen = ({
 
   const getAvarageRating = async () => {
     try {
-      const {data} = await axios.post(
-        `http://10.0.2.2:8080/api/restaurant/rating/avg`,
-        {
-          id: restaurantId,
-        },
-      );
+      const {data} = await axios.post(`${BASE_URL}/restaurant/rating/avg`, {
+        id: restaurantId,
+      });
       if (data.success) {
         setRating(data.averageRating);
       }
@@ -156,8 +162,6 @@ const RestaurantScreen = ({
     const point = turf.point(coordinate);
     return turf.distance(centerPoint, point);
   };
-
-
 
   useEffect(() => {
     fetchRestaurant();
@@ -349,10 +353,10 @@ const RestaurantScreen = ({
                     </Text>
                     <View className="flex-row justify-between  pb-2">
                       <View className="gap-1">
-                        <Text className="text-base font-POPPINS_MEDIUM">
+                        <Text className="text-sm text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                           Overall rating
                         </Text>
-                        <Text className="text-2xl font-POPPINS_SEMI_BOLD">
+                        <Text className="text-2xl text-DEFAULT_YELLOW font-POPPINS_SEMI_BOLD">
                           {rating.toFixed(1)}
                         </Text>
                         <View className="flex-row">
@@ -405,7 +409,7 @@ const RestaurantScreen = ({
                       </View>
                       <View className="flex">
                         <View className="flex-row space-x-2 items-center">
-                          <Text className="text-sm font-POPPINS_REGULAR">
+                          <Text className="text-sm text-DEFAULT_YELLOW font-POPPINS_REGULAR">
                             5
                           </Text>
                           <ProgressBar
@@ -422,7 +426,7 @@ const RestaurantScreen = ({
                           />
                         </View>
                         <View className="flex-row space-x-2 items-center">
-                          <Text className="text-sm font-POPPINS_REGULAR">
+                          <Text className="text-sm text-DEFAULT_YELLOW font-POPPINS_REGULAR">
                             4
                           </Text>
                           <ProgressBar
@@ -439,7 +443,7 @@ const RestaurantScreen = ({
                           />
                         </View>
                         <View className="flex-row space-x-2 items-center">
-                          <Text className="text-sm font-POPPINS_REGULAR">
+                          <Text className="text-sm text-DEFAULT_YELLOW font-POPPINS_REGULAR">
                             3
                           </Text>
                           <ProgressBar
@@ -456,7 +460,7 @@ const RestaurantScreen = ({
                           />
                         </View>
                         <View className="flex-row space-x-2 items-center">
-                          <Text className="text-sm font-POPPINS_REGULAR">
+                          <Text className="text-sm text-DEFAULT_YELLOW font-POPPINS_REGULAR">
                             2
                           </Text>
                           <ProgressBar
@@ -473,7 +477,7 @@ const RestaurantScreen = ({
                           />
                         </View>
                         <View className="flex-row space-x-2 items-center">
-                          <Text className="text-sm font-POPPINS_REGULAR pr-[3px]">
+                          <Text className="text-sm text-DEFAULT_YELLOW font-POPPINS_REGULAR pr-[3px]">
                             1
                           </Text>
                           <ProgressBar
@@ -501,7 +505,9 @@ const RestaurantScreen = ({
                             <View className="flex-row items-center">
                               <Image
                                 source={{
-                                  uri: comment?.postedBy?.image?.url,
+                                  uri:
+                                    comment?.postedBy?.image?.url ||
+                                    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/480px-User-avatar.svg.png',
                                 }}
                                 className="h-14 w-14 rounded-full"
                               />
@@ -553,7 +559,7 @@ const RestaurantScreen = ({
                             </View>
                             <View className="py-2">
                               <Text
-                                className="text-base font-POPPINS_REGULAR"
+                                className="text-base text-DEFAULT_BLACK font-POPPINS_REGULAR"
                                 numberOfLines={4}
                                 ellipsizeMode="tail">
                                 {comment?.text}
@@ -591,7 +597,7 @@ const RestaurantScreen = ({
                     <Text className="text-xl text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                       Details
                     </Text>
-                    <Text className="text-base font-POPPINS_MEDIUM">
+                    <Text className="text-sm text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                       Address
                     </Text>
                     <View className="flex-row space-x-1">
@@ -599,7 +605,7 @@ const RestaurantScreen = ({
                       <Text
                         numberOfLines={1}
                         ellipsizeMode="tail"
-                        className="text-base font-POPPINS_MEDIUM">
+                        className="text-base text-DEFAULT_BLACK font-POPPINS_MEDIUM">
                         {restaurant.address}
                       </Text>
                     </View>
@@ -636,7 +642,7 @@ const RestaurantScreen = ({
                         color={'#0E122B'}
                       />
                       <View>
-                        <Text className="text-base font-POPPINS_SEMI_BOLD">
+                        <Text className="text-sm text-DEFAULT_BLACK font-POPPINS_SEMI_BOLD">
                           Description
                         </Text>
                         <Text className="text-base font-POPPINS_REGULAR text-DEFAULT_BLACK">
@@ -648,7 +654,7 @@ const RestaurantScreen = ({
                     <View className="flex-row space-x-1">
                       <FontAwesome name="phone" size={20} color={'#0E122B'} />
                       <View>
-                        <Text className="text-base font-POPPINS_SEMI_BOLD">
+                        <Text className="text-sm text-DEFAULT_BLACK font-POPPINS_SEMI_BOLD">
                           Phone
                         </Text>
                         <Text className="text-base font-POPPINS_REGULAR text-DEFAULT_RED">
@@ -664,7 +670,7 @@ const RestaurantScreen = ({
                         color={'#0E122B'}
                       />
                       <View>
-                        <Text className="text-base font-POPPINS_SEMI_BOLD">
+                        <Text className="text-sm text-DEFAULT_BLACK font-POPPINS_SEMI_BOLD">
                           Hours of operation
                         </Text>
                         {/* Active */}

@@ -24,6 +24,7 @@ import {debounce, set} from 'lodash';
 import {useCallback} from 'react';
 import {UserContext} from '../../contexts/userContext';
 import Spinner from '../../components/Spinner';
+import { BASE_URL } from '../../helpers';
 
 const ManageMenuDishScreen = ({navigation}) => {
   const [nameDish, setNameDish] = useState();
@@ -41,7 +42,7 @@ const ManageMenuDishScreen = ({navigation}) => {
     setLoading(true);
     try {
       const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/dishes/${activeItem}`,
+        `${BASE_URL}/dishes/${activeItem}`,
       );
       if (data.success) {
         console.log('Dishes', data.dishes);
@@ -67,7 +68,7 @@ const ManageMenuDishScreen = ({navigation}) => {
     setLoading(true);
     try {
       const {data} = await axios.delete(
-        `http://10.0.2.2:8080/api/menu/delete/dish/${idDish}`,
+        `${BASE_URL}/menu/delete/dish/${idDish}`,
       );
       if (data.success) {
         console.log('Delete', idDish);

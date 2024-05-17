@@ -17,6 +17,7 @@ import axios from 'axios';
 import {useIsFocused} from '@react-navigation/native';
 import Spinner from '../../components/Spinner';
 import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
+import {BASE_URL} from '../../helpers';
 
 const RestaurantReviewScreen = ({
   navigation,
@@ -49,9 +50,7 @@ const RestaurantReviewScreen = ({
   const addVoucherToUser = async id => {
     console.log('id', id);
     try {
-      const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/vouncher/get/${id}`,
-      );
+      const {data} = await axios.put(`${BASE_URL}/vouncher/get/${id}`);
       if (data.success) {
         alert(data.message);
       }
@@ -65,7 +64,7 @@ const RestaurantReviewScreen = ({
     setLoading(true);
     try {
       const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/restaurant/comment/${restaurantId}`,
+        `${BASE_URL}/restaurant/comment/${restaurantId}`,
         {
           comment: content,
           rating,
@@ -85,7 +84,7 @@ const RestaurantReviewScreen = ({
 
   const fetchVouchers = async () => {
     const {data} = await axios.get(
-      `http://10.0.2.2:8080/api/vouncher/restaurant/${restaurantId}`,
+      `${BASE_URL}/vouncher/restaurant/${restaurantId}`,
     );
     if (data.success) {
       console.log('Vouchers', data.data);
@@ -97,7 +96,7 @@ const RestaurantReviewScreen = ({
     setLoading(true);
     try {
       const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/restaurant/show/${restaurantId}`,
+        `${BASE_URL}/restaurant/show/${restaurantId}`,
       );
       console.log('Restaurant', data.restaurant.comments);
       if (data.success) {
@@ -143,7 +142,7 @@ const RestaurantReviewScreen = ({
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
         </TouchableOpacity>
-        <Text className="text-lg w-full ml-32 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-lg w-full ml-40 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           Reviews
         </Text>
       </View>
@@ -162,7 +161,9 @@ const RestaurantReviewScreen = ({
                   <View className="flex-row items-center px-3">
                     <Image
                       source={{
-                        uri: item.postedBy.image.url,
+                        uri:
+                          item.postedBy.image.url ||
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/480px-User-avatar.svg.png',
                       }}
                       className="h-14 w-14 rounded-full"
                     />
@@ -204,7 +205,7 @@ const RestaurantReviewScreen = ({
                   </View>
                   <View className="py-2 px-3">
                     <Text
-                      className="text-base font-POPPINS_REGULAR"
+                      className="text-base text-DEFAULT_BLACK font-POPPINS_REGULAR"
                       numberOfLines={4}
                       ellipsizeMode="tail">
                       {item.text}
@@ -213,7 +214,7 @@ const RestaurantReviewScreen = ({
                 </View>
               ))}
 
-            <Separator height={200} />
+            <Separator height={70} />
           </View>
         </ScrollView>
       )}

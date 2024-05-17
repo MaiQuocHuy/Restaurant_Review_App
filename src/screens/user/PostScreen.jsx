@@ -19,6 +19,7 @@ import Spinner from '../../components/Spinner';
 import {useContext} from 'react';
 import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
 import {UserContext} from '../../contexts/userContext';
+import {BASE_URL} from '../../helpers';
 
 const PostScreen = ({navigation}) => {
   const {posts, setPosts} = useContext(dataUserGlobalContext);
@@ -29,7 +30,7 @@ const PostScreen = ({navigation}) => {
   const fetchPosts = async () => {
     setLoadingPost(true);
     try {
-      const {data} = await axios.get('http://10.0.2.2:8080/api/posts/show');
+      const {data} = await axios.get(`${BASE_URL}/posts/show`);
       console.log('Posts', data.posts);
 
       if (data.success) {
@@ -44,17 +45,13 @@ const PostScreen = ({navigation}) => {
 
   const handleToggleLike = async idPost => {
     try {
-      const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/like/post/${idPost}`,
-      );
+      const {data} = await axios.put(`${BASE_URL}/like/post/${idPost}`);
       console.log(data);
-      // const newPost = posts.map(item =>
-      //   item._id === idPost ? data.post : item,
-      // );
+
       if (data.success) {
         console.log('Posts', posts);
         const newPost = posts.map(post => {
-          if (post._id == idPost) {
+          if (String(post._id) === String(idPost)) {
             if (data.check) {
               // If data.check is true, add _id to likes array
               return {
@@ -108,6 +105,7 @@ const PostScreen = ({navigation}) => {
           user &&
           posts.length > 0 &&
           posts.map((item, index) => {
+            console.log('Item', item.image);
             if (item) {
               return (
                 <View className="mx-5 pt-5 space-y-4" key={index}>
@@ -115,8 +113,8 @@ const PostScreen = ({navigation}) => {
                     <Image
                       source={{
                         uri:
-                          item.postedBy.image.url ||
-                          ' https://as1.ftcdn.net/v2/jpg/03/24/73/92/1000_F_324739203_keeq8udvv0P2h1MLYJ0GLSlTBagoXS48.jpg',
+                          item?.postedBy?.image?.url ||
+                          'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/480px-User-avatar.svg.png',
                       }}
                       className="w-[15vw] h-[8vh] rounded-lg"
                     />
@@ -143,7 +141,8 @@ const PostScreen = ({navigation}) => {
                   <View className="flex-1">
                     <Image
                       source={{
-                        uri: item.image.url,
+                        uri:
+                          item?.image?.url || 'https://via.placeholder.com/150',
                       }}
                       className="w-full h-[24vh] rounded-lg"
                     />
@@ -193,7 +192,7 @@ const PostScreen = ({navigation}) => {
           })
         )}
 
-        <Separator height={60} />
+        <Separator height={80} />
       </ScrollView>
     </View>
   );

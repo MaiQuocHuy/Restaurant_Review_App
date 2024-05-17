@@ -17,6 +17,8 @@ import {UserContext} from '../../contexts/userContext';
 import {debounce, set} from 'lodash';
 import {useCallback} from 'react';
 import {UserLocationContext} from '../../contexts/userLocationContext';
+import {BASE_URL} from '../../helpers';
+import Spinner from '../../components/Spinner';
 const BookMarkedScreen = ({navigation}) => {
   const {restaurants, setRestaurants} = useContext(dataUserGlobalContext);
   const [restaurantsBookMark, setRestaurantsBookMark] = useState([]);
@@ -25,12 +27,12 @@ const BookMarkedScreen = ({navigation}) => {
   const {userLocation, setUserLocation} = useContext(UserLocationContext);
   const [originalRestaurantsBookMark, setOriginalRestaurantsBookMark] =
     useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchRestaurantsBookMarked = async () => {
+    setLoading(true);
     try {
-      const {data} = await axios.get(
-        'http://10.0.2.2:8080/api/restaurant/show',
-      );
+      const {data} = await axios.get(`${BASE_URL}/restaurant/show`);
       console.log('Data', data.restaurants);
       if (data.success) {
         setRestaurantsBookMark(
@@ -46,19 +48,19 @@ const BookMarkedScreen = ({navigation}) => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleBookMark = async id => {
     try {
-      const {data} = await axios.put(
-        `http://10.0.2.2:8080/api/restaurant/bookmark/${id}`,
-      );
+      const {data} = await axios.put(`${BASE_URL}/restaurant/bookmark/${id}`);
       console.log('Bookmark', data);
       if (data.success) {
         const updateRestaurantBookMarked = restaurantsBookMark => {
           return restaurantsBookMark.map(restaurant => {
-            if (restaurant._id == id) {
+            if (String(restaurant._id) === String(id)) {
               if (data.check) {
                 return {
                   ...restaurant,
@@ -116,8 +118,13 @@ const BookMarkedScreen = ({navigation}) => {
     if (textSearch.length > 0) {
       searchByNameRestaurant(textSearch);
     } else {
-      console.log(originalRestaurantsBookMark);
-      setRestaurantsBookMark(originalRestaurantsBookMark);
+      if (
+        originalRestaurantsBookMark &&
+        originalRestaurantsBookMark.length > 0
+      ) {
+        console.log(originalRestaurantsBookMark);
+        setRestaurantsBookMark(originalRestaurantsBookMark);
+      }
     }
   }, [textSearch]);
 
@@ -143,30 +150,34 @@ const BookMarkedScreen = ({navigation}) => {
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#000000" />
         </TouchableOpacity>
-        <Text className="text-lg w-full ml-28 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-lg w-full ml-36 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           BookMarked
         </Text>
       </View>
       <SearchComponent textSearch={textSearch} setTextSearch={setTextSearch} />
-      <ScrollView>
-        {restaurantsBookMark &&
-          restaurantsBookMark.length > 0 &&
-          restaurantsBookMark.map((item, index) => (
-            <View className="w-full pb-4" key={index}>
-              <RestaurantMediumCard
-                key={index}
-                {...item}
-                user={user}
-                userLocation={userLocation}
-                handleBookMark={handleBookMark}
-                navigate={restaurantId =>
-                  navigation.navigate('Restaurant', {restaurantId})
-                }
-              />
-            </View>
-          ))}
-        <Separator height={60} />
-      </ScrollView>
+      {loading ? (
+        <Spinner width={'100%'} height={100} />
+      ) : (
+        <ScrollView>
+          {restaurantsBookMark &&
+            restaurantsBookMark.length > 0 &&
+            restaurantsBookMark.map((item, index) => (
+              <View className="w-full pb-4" key={index}>
+                <RestaurantMediumCard
+                  key={index}
+                  {...item}
+                  user={user}
+                  userLocation={userLocation}
+                  handleBookMark={handleBookMark}
+                  navigate={restaurantId =>
+                    navigation.navigate('Restaurant', {restaurantId})
+                  }
+                />
+              </View>
+            ))}
+          <Separator height={60} />
+        </ScrollView>
+      )}
     </View>
   );
 };

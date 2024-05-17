@@ -13,13 +13,14 @@ import {Separator} from '../../components';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useEffect} from 'react';
+import {BASE_URL} from '../../helpers';
 
 const ChatBotScreen = ({navigation}) => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const getChatbotResponse = async () => {
     try {
-      const {data} = await axios.post('http://10.0.2.2:8080/api/message', {
+      const {data} = await axios.post(`${BASE_URL}/message`, {
         message: inputText,
       });
       if (data.success) return data.response;
@@ -83,7 +84,7 @@ const ChatBotScreen = ({navigation}) => {
           }}>
           <Ionicons name="chevron-back-outline" size={30} color="#0E122B" />
         </TouchableOpacity>
-        <Text className="text-lg w-full ml-28 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
+        <Text className="text-lg w-full ml-36 text-DEFAULT_BLACK font-POPPINS_MEDIUM">
           ChatBot
         </Text>
       </View>
@@ -136,9 +137,11 @@ const styles = StyleSheet.create({
   userMessage: {
     backgroundColor: '#DCF8C6',
     marginLeft: 'auto',
+    color: '#000',
   },
   chatbotMessage: {
     backgroundColor: '#E8E8E8',
+    color: '#000',
   },
   messageText: {
     fontSize: 16,
@@ -158,6 +161,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 20,
     paddingHorizontal: 10,
+    color: '#000',
   },
   sendButton: {
     backgroundColor: '#2196F3',

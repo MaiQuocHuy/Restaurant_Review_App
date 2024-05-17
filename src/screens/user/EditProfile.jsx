@@ -21,6 +21,7 @@ import axios from 'axios';
 import Spinner from '../../components/Spinner';
 import {UserContext} from '../../contexts/userContext';
 import {useContext} from 'react';
+import {BASE_URL} from '../../helpers';
 
 const EditProfile = ({navigation}) => {
   const [name, setName] = useState('');
@@ -81,15 +82,11 @@ const EditProfile = ({navigation}) => {
       });
       formdata.append('email', email);
       console.log('Form data', formdata);
-      const {data} = await axios.post(
-        'http://10.0.2.2:8080/api/user/update',
-        formdata,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+      const {data} = await axios.post(`${BASE_URL}/user/update`, formdata, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
         },
-      );
+      });
       console.log(data);
       if (data.success) {
         alert('Update successfully');
@@ -141,7 +138,7 @@ const EditProfile = ({navigation}) => {
             }}>
             <Ionicons name="chevron-back-outline" size={30} color="#FFFFFF" />
           </TouchableOpacity>
-          <Text className="text-lg w-full ml-28 text-DEFAULT_WHITE font-POPPINS_MEDIUM">
+          <Text className="text-lg w-full ml-36 text-DEFAULT_WHITE font-POPPINS_MEDIUM">
             Edit Profile
           </Text>
         </View>

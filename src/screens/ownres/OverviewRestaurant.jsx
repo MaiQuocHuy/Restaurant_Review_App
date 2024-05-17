@@ -18,6 +18,7 @@ import axios from 'axios';
 import ProgressBar from 'react-native-progress/Bar';
 import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
 import {UserContext} from '../../contexts/userContext';
+import {BASE_URL} from '../../helpers';
 
 const OverviewRestaurant = () => {
   const {restaurant, setRestaurant} = useContext(dataOwnresGlobalContext);
@@ -34,9 +35,7 @@ const OverviewRestaurant = () => {
   const fetchRestaurant = async () => {
     setLoading(true);
     try {
-      const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/admin/restaurant/show`,
-      );
+      const {data} = await axios.get(`${BASE_URL}/admin/restaurant/show`);
       if (data.success) {
         console.log('Restaurant', data.restaurant);
         setRestaurant(data.restaurant);
@@ -55,9 +54,7 @@ const OverviewRestaurant = () => {
 
   const getAvarageRating = async () => {
     try {
-      const {data} = await axios.get(
-        `http://10.0.2.2:8080/api/restaurant/rating/avg`,
-      );
+      const {data} = await axios.get(`${BASE_URL}/restaurant/rating/avg`);
       if (data.success) {
         setRating(data.averageRating);
       }

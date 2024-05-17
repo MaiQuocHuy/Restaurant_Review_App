@@ -18,6 +18,7 @@ import Spinner from '../../components/Spinner';
 import {useContext} from 'react';
 import {dataUserGlobalContext} from '../../contexts/dataUserGlobalContext';
 import {useEffect} from 'react';
+import {BASE_URL} from '../../helpers';
 
 const CreatePostScreen = ({navigation, route}) => {
   const idPost = route.params ? route.params.idPost : null;
@@ -59,15 +60,11 @@ const CreatePostScreen = ({navigation, route}) => {
           name: photo.name,
           type: photo.type,
         });
-        const {data} = await axios.post(
-          'http://10.0.2.2:8080/api/post/create',
-          formdata,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        const {data} = await axios.post(`${BASE_URL}/post/create`, formdata, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
+        });
         console.log('data', data);
         if (data) {
           setPhoto(null);
@@ -86,7 +83,7 @@ const CreatePostScreen = ({navigation, route}) => {
           name: Math.random().toString(36).substring(2, 8),
         });
         const {data} = await axios.put(
-          `http://10.0.2.2:8080/api/update/post/${idPost}`,
+          `${BASE_URL}/update/post/${idPost}`,
           formdata,
           {
             headers: {

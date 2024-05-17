@@ -16,6 +16,7 @@ import VoucherItem from '../../components/VoucherItem';
 import Spinner from '../../components/Spinner';
 import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
 import {UserContext} from '../../contexts/userContext';
+import {BASE_URL} from '../../helpers';
 const ManageRestaurantVoucher = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const {vouchers, setVouchers} = useContext(dataOwnresGlobalContext);
@@ -28,9 +29,7 @@ const ManageRestaurantVoucher = ({navigation}) => {
 
   const handleDelete = async id => {
     try {
-      const {data} = await axios.delete(
-        `http://10.0.2.2:8080/api/vouncher/delete/${id}`,
-      );
+      const {data} = await axios.delete(`${BASE_URL}/vouncher/delete/${id}`);
       if (data.success) {
         setVouchers(vouchers.filter(voucher => voucher._id !== id));
       }
@@ -42,9 +41,7 @@ const ManageRestaurantVoucher = ({navigation}) => {
   const fetchVouchers = async () => {
     try {
       setLoading(true);
-      const {data} = await axios.get(
-        'http://10.0.2.2:8080/api/restaurant/vouncher/show',
-      );
+      const {data} = await axios.get(`${BASE_URL}/restaurant/vouncher/show`);
       if (data.success) {
         console.log('Data', data.data);
         setVouchers(data.data);

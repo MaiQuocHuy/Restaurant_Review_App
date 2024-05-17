@@ -32,7 +32,9 @@ const VoucherItem = ({
       const startDate = new Date(newStart);
       const endDate = new Date(newEnd);
       const now = new Date();
-
+      console.log('Start Date', startDate);
+      console.log('End Date', endDate);
+      console.log('Now', now);
       if (now >= startDate && now <= endDate) {
         return true; // Thời gian hiện tại nằm trong khoảng thời gian từ startDate đến endDate
       } else {
@@ -44,9 +46,9 @@ const VoucherItem = ({
   };
 
   const formattedDate = date => {
-    const format = `${date.getFullYear()}-${String(
-      date.getMonth() + 1,
-    ).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const format = `${date.getUTCFullYear()}-${String(
+      date.getUTCMonth() + 1,
+    ).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
     return format;
   };
   return (

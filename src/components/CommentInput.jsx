@@ -22,7 +22,7 @@ const CommentInput = ({
 }) => {
   return (
     <View className="w-[90%] mx-5 my-6">
-      <View className="w-full flex-row space-x-2">
+      <View className="w-full flex-row space-x-2 items-center">
         <Image
           source={{
             uri:
@@ -46,7 +46,7 @@ const CommentInput = ({
           value={comment}
         />
         {loadingComment ? (
-          <View style={{position: 'absolute', top: 4, right: 10}}>
+          <View style={{height: 30, width: 30}}>
             <Spinner width={40} height={40} />
           </View>
         ) : (
@@ -55,7 +55,7 @@ const CommentInput = ({
               name="send-o"
               size={30}
               color={comment != '' ? '#0A8791' : '#C2C2CB'}
-              style={styles.sendIcon}
+              className={styles.sendIcon}
             />
           </TouchableOpacity>
         )}
@@ -66,9 +66,8 @@ const CommentInput = ({
 
 const styles = StyleSheet.create({
   sendIcon: {
-    position: 'absolute',
-    right: 16,
-    top: 12,
+    height: 30,
+    width: 30,
   },
 });
 export default CommentInput;

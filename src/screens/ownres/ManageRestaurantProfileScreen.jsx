@@ -23,6 +23,7 @@ import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
 import {set} from 'lodash';
 import {useContext} from 'react';
 import {UserContext} from '../../contexts/userContext';
+import {BASE_URL} from '../../helpers';
 
 const ManageRestaurantProfileScreen = ({navigation}) => {
   console.log('ManageRestaurantProfileScreen');
@@ -52,9 +53,7 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
   const fetchData = async () => {
     setLoadingProfileRestaurant(true);
     try {
-      const {data} = await axios.get(
-        'http://10.0.2.2:8080/api/admin/restaurant/show',
-      );
+      const {data} = await axios.get(`${BASE_URL}/admin/restaurant/show`);
       console.log('Data fetch: ', data);
       if (data.success) {
         updateValue(data);
@@ -138,6 +137,10 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
       console.log('Please fill all the fields');
       return;
     }
+    if (!phone.match(/^[0-9]+$/) || phone.length !== 10) {
+      console.log('Phone must be a number and exactly 10 digits');
+      return;
+    }
     try {
       console.log('Time', time);
       console.log('TextButotm', textButton);
@@ -157,7 +160,7 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
         });
         setLoadingProfileRestaurant(true);
         const {data} = await axios.put(
-          'http://10.0.2.2:8080/api/restaurant/update',
+          `${BASE_URL}/restaurant/update`,
           formData,
           {
             headers: {
@@ -196,7 +199,7 @@ const ManageRestaurantProfileScreen = ({navigation}) => {
         });
         setLoadingProfileRestaurant(true);
         const {data} = await axios.post(
-          'http://10.0.2.2:8080/api/restaurant/create',
+          `${BASE_URL}/restaurant/create`,
           formData, // send formData directly, not wrapped in an object
           {
             headers: {

@@ -131,6 +131,7 @@ const BottomSheetModel = ({handleModal, handleSubmit, ...rest}) => {
                 paddingHorizontal: 10,
                 paddingVertical: 6,
                 minHeight: 50,
+                color: '#000',
               }}
               placeholder="Comment"
               placeholderTextColor="#C2C2CB"

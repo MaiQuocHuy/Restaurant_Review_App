@@ -18,6 +18,7 @@ import axios from 'axios';
 import {dataOwnresGlobalContext} from '../../contexts/dataOwnresGlobalContext';
 import {useContext} from 'react';
 import Spinner from '../../components/Spinner';
+import {BASE_URL} from '../../helpers';
 
 const AddDishScreen = ({navigation, route}) => {
   const idDish = route.params ? route.params.idDish : null;
@@ -93,7 +94,7 @@ const AddDishScreen = ({navigation, route}) => {
           name: Math.random().toString(36).substring(2, 8),
         });
         const {data} = await axios.put(
-          `http://10.0.2.2:8080/api/menu/update/dish/${idDish}`,
+          `${BASE_URL}/menu/update/dish/${idDish}`,
           formData,
           {
             headers: {
@@ -131,15 +132,11 @@ const AddDishScreen = ({navigation, route}) => {
           type: photo.assets[0].type,
           name: photo.assets[0].fileName,
         });
-        const {data} = await axios.post(
-          'http://10.0.2.2:8080/api/menu/create',
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        const {data} = await axios.post(`${BASE_URL}/menu/create`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
+        });
         if (data.success) {
           console.log('Create Dish', data);
           setDishes(prevDishes => [...prevDishes, data.menuItem]);

@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Images} from '../constants';
 import {Separator} from '../components';
 import axios from 'axios';
+import {BASE_URL} from '../helpers';
 
 export default function SignUpScreen({navigation}) {
   const [username, setUsername] = useState('');
@@ -26,7 +27,7 @@ export default function SignUpScreen({navigation}) {
       password,
     };
     try {
-      const {data} = await axios.post('http://10.0.2.2:8080/api/signup', {
+      const {data} = await axios.post(`${BASE_URL}/signup`, {
         name: username,
         email,
         password,

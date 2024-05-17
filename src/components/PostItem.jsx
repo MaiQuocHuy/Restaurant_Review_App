@@ -46,7 +46,7 @@ const PostItem = ({
             source={{
               uri:
                 item.postedBy.image.url ||
-                ' https://as1.ftcdn.net/v2/jpg/03/24/73/92/1000_F_324739203_keeq8udvv0P2h1MLYJ0GLSlTBagoXS48.jpg',
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/480px-User-avatar.svg.png',
             }}
             className="w-[15vw] h-[8vh] rounded-lg"
           />

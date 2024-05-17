@@ -17,13 +17,14 @@ import axios from 'axios';
 import {useNavigation} from '@react-navigation/native';
 import {removeTokenInStorage} from '../helpers/asyncStorage';
 import {UserContext} from '../contexts/userContext';
+import {BASE_URL} from '../helpers';
 
 const CustomDrawer = props => {
   const navigation = useNavigation();
   const {user, setUser} = useContext(UserContext);
   const handleSignOut = async () => {
     try {
-      const {data} = await axios.get('http://10.0.2.2:8080/api/logout');
+      const {data} = await axios.get(`${BASE_URL}/logout`);
       console.log(data);
       removeTokenInStorage('token');
       if (data.success) {
